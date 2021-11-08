@@ -53,7 +53,10 @@ while True:
                 os.system(root + "/bin/packwiz init " + '--name ' + name + ' --author ' + author + ' --version ' + pack_version + ' --mc-version ' + mc_version + ' --modloader ' + modloader + ' --' + modloader + '-version ' + modloader_version)
             if platform.system() == 'Darwin':
                 #os.system('\"bin\packwiz init\" --name "{}" --author "{}" --version "{}" --mc-version "{}" --modloader "{}" --{}-version "{}"', str(values[0]), str(values[1]), str(values[2]), str(values[3]), str(values[4]), str(values[4]), str(values[5]))
-                print("macOS")
+                os.system(root + "/bin/packwiz init " + '--name ' + name + ' --author ' + author + ' --version ' + pack_version + ' --mc-version ' + mc_version + ' --modloader ' + modloader + ' --' + modloader + '-version ' + modloader_version)
+        else:
+            os.system(root + "/bin/packwiz init " + '--name ' + name + ' --author ' + author + ' --version ' + pack_version + ' --mc-version ' + mc_version + ' --modloader ' + modloader + ' --' + modloader + '-version ' + modloader_version)
+            
     os.chdir('../..')
             
 
