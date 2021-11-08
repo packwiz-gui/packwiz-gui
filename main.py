@@ -13,13 +13,10 @@ new_pack_layout = [  [sg.Text('Pack name:'), sg.InputText()],
             [sg.Text('Modloader (\'forge\' or \'fabric\'):'), sg.InputText()],
             [sg.Text('Modloader Version:'), sg.InputText()],
             [sg.Button("Create")]]
-pack_layout = [  [sg.Text('Pack name:'), sg.InputText()],
-            [sg.Text('Author:'), sg.InputText()],
-            [sg.Text('Pack Version:'), sg.InputText()],
-            [sg.Text('Minecraft Version:'), sg.InputText()],
-            [sg.Text('Modloader (\'forge\' or \'fabric\'):'), sg.InputText()],
-            [sg.Text('Modloader Version:'), sg.InputText()],
-            [sg.Button("Create")]]
+
+pack_layout = [  [sg.Text('Mod Type (\'mr\' or \'cf\'): '), sg.InputText()],
+            [sg.Text('Mod URL: '), sg.InputText()],
+            [sg.Button('Add Mod')]]
 
 # Create the Window
 window = sg.Window('New Packwiz Pack', new_pack_layout)
@@ -61,8 +58,15 @@ while True:
                 os.mkdir("instances/" + name)
                 os.chdir("instances/" + name)
                 os.system(root + "/bin/packwiz init " + '--name ' + name + ' --author ' + author + ' --version ' + pack_version + ' --mc-version ' + mc_version + ' --modloader ' + modloader + ' --' + modloader + '-version ' + modloader_version)
+                window = sg.Window("Editing Pack", pack_layout)
             
-    os.chdir('../..')
+        os.chdir('../..')
+    if event == "Add Mod":
+        mod_type = values[0]
+        mod_url = values[1]
+        os.chdir(root + "/instances/" + name)
+        os.system(root + "/bin/packwiz " + mod_type + " install " + mod_url)
+        
             
 
 window.close()
