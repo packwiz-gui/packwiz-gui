@@ -51,7 +51,7 @@ while True:
                 #subprocess.Popen('\"bin\packwiz\"', 'init', '--name', values[0], '--author', values[1], '--version', values["2"], '--mc-version', values["3"], '--modloader', "fabric", '--fabric--version', values["5"], 'instances/', values["Pack name:"])
                 #os.system('\"bin\packwiz init\" --name "{}" --author "{}" --version "{}" --mc-version "{}" --modloader "{}" --{}-version "{}"', name, author, pack_version, mc_version, modloader, modloader, modloader_version)
                 os.system(root + "/bin/packwiz init " + '--name ' + name + ' --author ' + author + ' --version ' + pack_version + ' --mc-version ' + mc_version + ' --modloader ' + modloader + ' --' + modloader + '-version ' + modloader_version)
-            if platform.system() == 'Darwin':
+            if platform.system() == 'Darwin' or 'Linux':
                 #os.system('\"bin\packwiz init\" --name "{}" --author "{}" --version "{}" --mc-version "{}" --modloader "{}" --{}-version "{}"', str(values[0]), str(values[1]), str(values[2]), str(values[3]), str(values[4]), str(values[4]), str(values[5]))
                 os.system(root + "/bin/packwiz init " + '--name ' + name + ' --author ' + author + ' --version ' + pack_version + ' --mc-version ' + mc_version + ' --modloader ' + modloader + ' --' + modloader + '-version ' + modloader_version)
         else:
