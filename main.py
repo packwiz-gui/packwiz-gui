@@ -15,7 +15,7 @@ new_pack_layout = [  [sg.Text('Pack name:'), sg.InputText()],
             [sg.Button("Create")]]
 
 pack_layout = [  [sg.Text('Mod Type (\'mr\' or \'cf\'): '), sg.InputText()],
-            [sg.Text('Mod URL: '), sg.InputText()],
+            [sg.Text('Mod ID: '), sg.InputText()],
             [sg.Button('Add Mod')]]
 
 # Create the Window
