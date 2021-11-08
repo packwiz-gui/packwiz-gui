@@ -14,7 +14,7 @@ new_pack_layout = [  [sg.Text('Pack name:'), sg.InputText()],
             [sg.Text('Modloader Version:'), sg.InputText()],
             [sg.Button("Create")]]
 
-pack_layout = [  [sg.Text('Mod Type (\'mr\' or \'cf\'): '), sg.InputText()],
+pack_layout = [  [sg.Text('Mod Type (\'modrinth\' or \'curseforge\'): '), sg.InputText()],
             [sg.Text('Mod ID: '), sg.InputText()],
             [sg.Button('Add Mod')]]
 
