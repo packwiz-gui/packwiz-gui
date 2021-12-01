@@ -7,6 +7,10 @@ import subprocess
 root = os.getcwd()
 sg.theme("DarkGrey9")   # Add a touch of color
 # All the stuff inside your window.
+main_menu = [
+            [sg.Button("Create a new pack")],
+            [sg.Button("Open an existing pack")]
+            ]
 pack_create = [
             [sg.Text("Pack name:"), sg.InputText()],
             [sg.Text("Author:"), sg.InputText()],
@@ -24,7 +28,7 @@ pack_edit = [
             ]
 
 # Create the Window
-window = sg.Window("New Packwiz Pack", pack_create)
+window = sg.Window("Main Menu", main_menu)
 
 if platform.system() == "Windows":
     packwiz = f"{root}\\bin\\packwiz.exe"
@@ -57,5 +61,8 @@ while True:
         mod_url = values[1]
         os.chdir(f"{root}/instances/{name}")
         os.system(f"{packwiz} {source_type} install {mod_url}")
+    if event == "Create a new pack":
+        window.close()
+        window = sg.Window("Creating a new pack", pack_create)
 
 window.close()
