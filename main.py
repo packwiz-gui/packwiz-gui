@@ -79,22 +79,23 @@ while True:
         
     if event == "Open an existing pack":
         if platform.system() == "Windows":
-            command = f"dir"
+            command = f"cmd.exe dir"
         elif platform.system() == "Darwin" or "Linux":
-            command = f"ls"
+            command = f"ls -C"
 
         #status, output = commands.getstatusoutput(f"{command} {root}/instances")
-
-        def cmdline(command):
-            process = Popen(
-            args=command,
-            stdout=PIPE,
-            shell=True)
+        cmd = f"{command} {root}/instances/"
+        process = Popen(
+        args=cmd,
+        stdout=PIPE,
+        stderr=PIPE,
+        shell=True)
+            
 
         pack_list = [
-                    [sg.Text(cmdline(f"{command} {root}/instances"))]
+                    [sg.Text(process.stdout.read())]
                     ]
-
+        print(process.stdout.read())
         window = sg.Window("Listing existing packs", pack_list)
 
 
