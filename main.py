@@ -2,29 +2,41 @@
 import PySimpleGUI as sg
 import os
 import platform
-import subprocess
+from subprocess import PIPE, Popen
 
 root = os.getcwd()
-sg.theme("DarkGrey9")   # Add a touch of color
+sg.theme("DarkGrey9") 
+right_click_menu=sg.MENU_RIGHT_CLICK_EDITME_VER_EXIT  # Add a touch of color
 # All the stuff inside your window.
+instances_list = ""
 main_menu = [
-            [sg.Button("Create a new pack")],
-            [sg.Button("Open an existing pack")]
-            ]
+                [sg.Text("")],
+                [sg.Button("Create a new pack")],
+                [sg.Text("")],
+                [sg.Button("Open an existing pack")],
+                [sg.Text("")]
+                ]
+
 pack_create = [
-            [sg.Text("Pack name:"), sg.InputText()],
-            [sg.Text("Author:"), sg.InputText()],
-            [sg.Text("Pack Version:"), sg.InputText()],
-            [sg.Text("Minecraft Version:"), sg.InputText()],
-            [sg.Text("Modloader"), sg.Combo(["forge", "fabric"])],
-            [sg.Text("Modloader Version:"), sg.InputText()],
-            [sg.Button("Create")]
-            ]
+              [sg.Text("Pack name:"), sg.InputText()],
+              [sg.Text("Author:"), sg.InputText()],
+              [sg.Text("Pack Version:"), sg.InputText()],
+              [sg.Text("Minecraft Version:"), sg.InputText()],
+              [sg.Text("Modloader"), sg.Combo(["forge", "fabric"])],
+              [sg.Text("Modloader Version:"), sg.InputText()],
+              [sg.Button("Create")],
+              [sg.Text("")],
+              ]
 
 pack_edit = [
             [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"])],
             [sg.Text("Mod ID: "), sg.InputText()],
-            [sg.Button("Add Mod")]
+            [sg.Button("Add Mod")],
+            [sg.Text("")],
+            ]
+
+pack_list = [
+            [sg.Text(instances_list)]
             ]
 
 # Create the Window
@@ -53,7 +65,7 @@ while True:
         os.mkdir(f"instances/{name}")
         os.chdir(f"instances/{name}")
         os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-
+        
         window = sg.Window("Editing Pack", pack_edit)
             
     if event == "Add Mod":
@@ -61,8 +73,29 @@ while True:
         mod_url = values[1]
         os.chdir(f"{root}/instances/{name}")
         os.system(f"{packwiz} {source_type} install {mod_url}")
+    
     if event == "Create a new pack":
-        window.close()
         window = sg.Window("Creating a new pack", pack_create)
+        
+    if event == "Open an existing pack":
+        if platform.system() == "Windows":
+            command = f"dir"
+        elif platform.system() == "Darwin" or "Linux":
+            command = f"ls"
+
+        #status, output = commands.getstatusoutput(f"{command} {root}/instances")
+
+        def cmdline(command):
+            process = Popen(
+            args=command,
+            stdout=PIPE,
+            shell=True)
+
+        pack_list = [
+                    [sg.Text(cmdline(f"{command} {root}/instances"))]
+                    ]
+
+        window = sg.Window("Listing existing packs", pack_list)
+
 
 window.close()

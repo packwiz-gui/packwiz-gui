@@ -1,0 +1,6 @@
+hash-format = "sha256"
+
+[[files]]
+file = "mods/sodium.toml"
+hash = "55f39b31f37997e41e0578693103e50cebc79d4eee509801479cc50a75eeb347"
+metafile = true
