@@ -78,7 +78,7 @@ while True:
     if event == "Add Mod":
         source_type = values[0]
         mod_url = values[1]
-        os.chdir(f"{root}/instances/{name}")
+        os.chdir(f"{root}/instances/{name}_pack")
         os.system(f"{packwiz} {source_type} install {mod_url}")
     
     if event == "Create a new pack":
@@ -101,12 +101,21 @@ while True:
         stderr=PIPE,
         shell=True)
             
-        instances_list = process.stdout.read()[:-6]
+        instances_list = process.stdout.read()
         pack_list = [
-                    [sg.Text(instances_list.decode("utf-8"))]
+                    [sg.Text(instances_list.decode("utf-8"))],
+                    [sg.Text("Pack Name to open: "), sg.InputText()],
+                    [sg.Button("Open")]
                     ]
         print(process.stdout.read())
         window = sg.Window("Listing existing packs", pack_list)
+    
+    if event == "Open":
+        os.chdir(f"{root}/instances/{values[0]}_pack")
+        name = values[0]
+        window.close()
+        window = sg.Window("Editing Pack", pack_edit)
+        
 
 
 window.close()
