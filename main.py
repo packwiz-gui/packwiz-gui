@@ -38,6 +38,8 @@ pack_edit = [
             [sg.Button("Add Mod")],
             [sg.Button("Remove Mod")],
             [sg.Button("View Installed Mods")],
+            [sg.Button("Export to CF pack")],
+            [sg.Text("")],
             [sg.Text("")],
             ]
 
@@ -81,8 +83,9 @@ while True:
         os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
         
         pack_root = f"{root}/instances/{name}_pack"
+        os.system(f"echo \"{name}\*\" > .packwizignore")
         window = sg.Window("Editing Pack", pack_edit)
-            
+        
     if event == "Add Mod":
         source_type = values[0]
         mod_url = values[1]
@@ -136,6 +139,7 @@ while True:
         name = values[0]
         pack_root = f"{root}/instances/{name}_pack"
         window.close()
+        os.system(f"{packwiz} refresh")
         window = sg.Window("Editing Pack", pack_edit)
 
     if event == "View Installed Mods":
@@ -143,6 +147,7 @@ while True:
             command = f"cmd.exe dir"
         elif osys == "unix":
             command = f"ls"
+
 
         cmd = f"{command} {pack_root}/mods"
 
@@ -165,6 +170,31 @@ while True:
         mod_url = values[1]
         os.chdir(f"{pack_root}")
         os.system(f"{packwiz} remove {mod_url}")
+
+    if event == "Export to CF pack":
+        def open_file(path):
+            if platform.system() == "Windows":
+                os.startfile(path)
+            elif platform.system() == "Darwin":
+                Popen(["open", path])
+            else:
+                Popen(["xdg-open", path])
+        os.system(f"{packwiz} cf export")
+        
+
+        pack_edit = [
+            [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"])],
+            [sg.Text("Mod ID: "), sg.InputText()],
+            [sg.Text("")],
+            [sg.Button("Add Mod")],
+            [sg.Button("Remove Mod")],
+            [sg.Button("View Installed Mods")],
+            [sg.Button("Export to CF pack")],
+            [sg.Text("Pack zip ready in opened directory")],
+            [sg.Text("")],
+            ]
+        window = sg.Window("Editing Pack", pack_edit)
+        open_file(f"{pack_root}/")
 
     if event == "Close":
         main_menu = [
