@@ -15,7 +15,8 @@ main_menu = [
                 [sg.Button("Create a new pack")],
                 [sg.Text("")],
                 [sg.Button("Open an existing pack")],
-                [sg.Text("")]
+                [sg.Text("")],
+                [sg.Button("Close packwiz-gui")]
                 ]
 
 pack_create = [
@@ -26,6 +27,7 @@ pack_create = [
               [sg.Text("Modloader"), sg.Combo(["forge", "fabric"])],
               [sg.Text("Modloader Version:"), sg.InputText()],
               [sg.Button("Create")],
+              [sg.Button("Close")],
               [sg.Text("")],
               ]
 
@@ -63,6 +65,7 @@ elif platform.system() == "Darwin" or "Linux":
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == "Cancel": # if user closes window or clicks cancel
+        window.close()
         break
     if event == "Create":
 
@@ -77,6 +80,8 @@ while True:
         os.chdir(f"instances/{name}_pack")
         os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
         
+        pack_root = f"{root}/instances/{name}_pack"
+
         window = sg.Window("Editing Pack", pack_edit)
             
     if event == "Add Mod":
@@ -150,6 +155,11 @@ while True:
         os.system(f"{packwiz} remove {mod_url}")
 
     if event == "Close":
+        window.hide()
+
+    if event == "Close packwiz-gui":
         window.close()
+        
 
 window.close()
+
