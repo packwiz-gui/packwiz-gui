@@ -11,13 +11,13 @@ right_click_menu=sg.MENU_RIGHT_CLICK_EDITME_VER_EXIT  # Add a touch of color
 instances_list = ""
 
 main_menu = [
-                [sg.Text("")],
-                [sg.Button("Create a new pack")],
-                [sg.Text("")],
-                [sg.Button("Open an existing pack")],
-                [sg.Text("")],
-                [sg.Button("Close packwiz-gui")]
-                ]
+            [sg.Text("")],
+            [sg.Button("Create a new pack")],
+            [sg.Text("")],
+            [sg.Button("Open an existing pack")],
+            [sg.Text("")],
+            [sg.Button("Close packwiz-gui")]
+            ]
 
 pack_create = [
               [sg.Text("Pack name:"), sg.InputText()],
@@ -81,7 +81,6 @@ while True:
         os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
         
         pack_root = f"{root}/instances/{name}_pack"
-
         window = sg.Window("Editing Pack", pack_edit)
             
     if event == "Add Mod":
@@ -91,6 +90,18 @@ while True:
         os.system(f"{packwiz} {source_type} install {mod_url}")
     
     if event == "Create a new pack":
+        pack_create = [
+              [sg.Text("Pack name:"), sg.InputText()],
+              [sg.Text("Author:"), sg.InputText()],
+              [sg.Text("Pack Version:"), sg.InputText()],
+              [sg.Text("Minecraft Version:"), sg.InputText()],
+              [sg.Text("Modloader"), sg.Combo(["forge", "fabric"])],
+              [sg.Text("Modloader Version:"), sg.InputText()],
+              [sg.Button("Create")],
+              [sg.Button("Close")],
+              [sg.Text("")],
+              ]
+        window.close()
         window = sg.Window("Creating a new pack", pack_create)
         
     if event == "Open an existing pack":
@@ -114,9 +125,10 @@ while True:
         pack_list = [
                     [sg.Text(instances_list.decode("utf-8"))],
                     [sg.Text("Pack Name to open: "), sg.InputText()],
-                    [sg.Button("Open")]
+                    [sg.Button("Open")], [sg.Button("Close")]
                     ]
         print(process.stdout.read())
+        window.close()
         window = sg.Window("Listing existing packs", pack_list)
     
     if event == "Open":
@@ -155,7 +167,16 @@ while True:
         os.system(f"{packwiz} remove {mod_url}")
 
     if event == "Close":
-        window.hide()
+        main_menu = [
+                    [sg.Text("")],
+                    [sg.Button("Create a new pack")],
+                    [sg.Text("")],
+                    [sg.Button("Open an existing pack")],
+                    [sg.Text("")],
+                    [sg.Button("Close packwiz-gui")]
+                    ]
+        window.close()
+        window = sg.Window("Main Menu", main_menu)
 
     if event == "Close packwiz-gui":
         window.close()
