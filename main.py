@@ -9,6 +9,7 @@ sg.theme("DarkGrey9")
 right_click_menu=sg.MENU_RIGHT_CLICK_EDITME_VER_EXIT  # Add a touch of color
 # All the stuff inside your window.
 instances_list = ""
+
 main_menu = [
                 [sg.Text("")],
                 [sg.Button("Create a new pack")],
@@ -48,20 +49,16 @@ list_installed_mods =
                     ]
 
 
-if platform.system() == 'Darwin' or 'Linux':
-    linux = True
-    windows = False
-if platform.system() == 'Windows':
-    windows = True
-    linux = False
 # Create the Window
 window = sg.Window("Main Menu", main_menu)
 
 if platform.system() == "Windows":
     packwiz = f"{root}\\bin\\packwiz.exe"
+    osys = "windows"
 elif platform.system() == "Darwin" or "Linux":
     packwiz = f"{root}/bin/packwiz"
     os.system(f"chmod +x {packwiz}")
+    osys = "unix"
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
@@ -93,10 +90,10 @@ while True:
         window = sg.Window("Creating a new pack", pack_create)
         
     if event == "Open an existing pack":
-        if windows == True:
+        if osys == "windows":
             command = f"cmd.exe dir"
             command2 = f""
-        elif linux == True:
+        elif osys == "unix":
             command = f"ls"
             #command2 =  f"| awk {'print $9'}"
             command2 = f"| grep _pack"
