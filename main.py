@@ -144,6 +144,11 @@ while True:
         
         window = sg.Window("Listing installed mods", list_installed_mods)
     
+    if event == "Remove Mod":
+        mod_url = values[1]
+        os.chdir(f"{pack_root}")
+        os.system(f"{packwiz} remove {mod_url}")
+
     if event == "Close":
         window.close()
 
