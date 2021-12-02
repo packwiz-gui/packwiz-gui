@@ -81,7 +81,7 @@ while True:
         if platform.system() == "Windows":
             command = f"cmd.exe dir"
         elif platform.system() == "Darwin" or "Linux":
-            command = f"ls -C"
+            command = f"ls -Al | awk {'print $9'}"
 
         #status, output = commands.getstatusoutput(f"{command} {root}/instances")
         cmd = f"{command} {root}/instances/"
