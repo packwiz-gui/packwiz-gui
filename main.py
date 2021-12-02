@@ -43,10 +43,9 @@ pack_list = [
             [sg.Text(instances_list)]
             ]
 
-list_installed_mods = 
-                    [
-                    [sg.Text("Error: List of installed mods not loaded")]
-                    ]
+list_installed_mods = [
+                      [sg.Text("Error: List of installed mods not loaded")]
+                      ]
 
 
 # Create the Window
