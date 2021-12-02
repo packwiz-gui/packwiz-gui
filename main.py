@@ -31,13 +31,21 @@ pack_create = [
 pack_edit = [
             [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"])],
             [sg.Text("Mod ID: "), sg.InputText()],
+            [sg.Text("")],
             [sg.Button("Add Mod")],
+            [sg.Button("Remove Mod")],
+            [sg.Button("View Installed Mods")],
             [sg.Text("")],
             ]
 
 pack_list = [
             [sg.Text(instances_list)]
             ]
+
+list_installed_mods = 
+                    [
+                    [sg.Text("Error: List of installed mods not loaded")]
+                    ]
 
 
 if platform.system() == 'Darwin' or 'Linux':
@@ -115,6 +123,7 @@ while True:
         name = values[0]
         window.close()
         window = sg.Window("Editing Pack", pack_edit)
+
         
 
 
