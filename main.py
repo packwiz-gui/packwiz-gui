@@ -43,10 +43,9 @@ pack_list = [
             [sg.Text(instances_list)]
             ]
 
-list_installed_mods = 
-                    [
-                    [sg.Text("Error: List of installed mods not loaded")]
-                    ]
+list_installed_mods = [
+                      [sg.Text("Error: List of installed mods not loaded")]
+                      ]
 
 
 # Create the Window
@@ -118,10 +117,34 @@ while True:
     if event == "Open":
         os.chdir(f"{root}/instances/{values[0]}_pack")
         name = values[0]
+        pack_root = f"{root}/instances/{name}_pack"
         window.close()
         window = sg.Window("Editing Pack", pack_edit)
 
-        
+    if event == "View Installed Mods":
+        if osys == "windows":
+            command = f"cmd.exe dir"
+        elif osys == "unix":
+            command = f"ls"
 
+        cmd = f"{command} {pack_root}/mods"
+
+        process = Popen(
+        args=cmd,
+        stdout=PIPE,
+        stderr=PIPE,
+        shell=True)
+
+        mods_list = process.stdout.read()
+
+        list_installed_mods = [
+                              [sg.Text(mods_list.decode("utf-8"))],
+                              [sg.Button("Close")]
+                              ]
+        
+        window = sg.Window("Listing installed mods", list_installed_mods)
+    
+    if event == "Close":
+        window.close()
 
 window.close()
