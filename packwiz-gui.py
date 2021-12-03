@@ -125,8 +125,26 @@ while True:
             if event3 == "Delete (WARNING: CANNOT BE UNDONE)":
                 name = values3[0]
                 pack_root = f"{root}/instances/{name}_pack"
-                rmtree(f"{pack_root}")
-                print(f"Pack {name} deleted.")
+                delete_dialog = [
+                                [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA. WE ARE NOT RESPONSIBLE FOR ANY OF YOUR PACK'S DATA LOSS. ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE? ")],
+                                [sg.Button("Yes"), sg.Button("No")]
+                                ]
+                window6 = sg.Window("Are you sure?", delete_dialog)
+
+            while True:
+                event6, values6 = window6.read()
+                # Existing modify window close check
+                if event6 in (sg.WIN_CLOSED, "No"):
+                    window6.close()
+                    WINDOW6_ACTIVE = False
+                    break
+                if event6 == "Yes":
+                    rmtree(f"{pack_root}")
+                    print(f"Pack {name} deleted.")
+
+                    window6.close()
+                    WINDOW6_ACTIVE = False
+                    break
 
             if event3 == "Open" and not WINDOW4_ACTIVE:
                 name = values3[0]
