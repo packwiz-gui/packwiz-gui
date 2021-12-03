@@ -3,6 +3,7 @@ import os
 import platform
 from subprocess import PIPE, Popen
 import PySimpleGUI as sg
+from shutil import rmtree
 
 root = os.getcwd()
 sg.theme("DarkGrey9") # Add a touch of color
@@ -120,6 +121,13 @@ while True:
                 break
 
             WINDOW4_ACTIVE = False
+
+            if event3 == "Delete (WARNING: CANNOT BE UNDONE)":
+                name = values3[0]
+                pack_root = f"{root}/instances/{name}_pack"
+                rmtree(f"{pack_root}")
+                print(f"Pack {name} deleted.")
+
             if event3 == "Open" and not WINDOW4_ACTIVE:
                 name = values3[0]
                 pack_root = f"{root}/instances/{name}_pack"
@@ -140,12 +148,6 @@ while True:
                 WINDOW4_ACTIVE = True
                 window3.hide()
                 window4 = sg.Window("Editing Pack", pack_edit)
-
-            if event3 == "Delete (WARNING: CANNOT BE UNDONE)":
-                name = values3[0]
-                pack_root = f"{root}/instances/{name}_pack"
-                os.rmdir(f"{pack_root}")
-                print(f"Pack {name} deleted.")
 
 
                 # EVENT4 - Editing Packs
