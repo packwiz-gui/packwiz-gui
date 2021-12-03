@@ -1,0 +1,8 @@
+5c5
+< import PySimpleGUI as sg
+---
+> import PySimpleGUIQt as sg
+8c8
+< sg.theme("DarkGrey9") # Add a touch of color
+---
+> sg.theme("SystemDefaultForReal") # Add a touch of color
