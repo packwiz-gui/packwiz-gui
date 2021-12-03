@@ -38,6 +38,9 @@ while True:
     if event1 in (sg.WIN_CLOSED, "Close packwiz-gui"):
         window1.close()
         break
+    
+
+    # EVENT1 - Main Menu
 
     if event1 == "Create a new pack" and not WINDOW2_ACTIVE:
         pack_create = [
@@ -54,6 +57,8 @@ while True:
         WINDOW2_ACTIVE = True
         window1.Hide()
         window2 = sg.Window("Creating a new pack", pack_create)
+        
+        # EVENT2 - Creating a new pack
 
         while True:
             event2, values2 = window2.read()
@@ -79,7 +84,7 @@ while True:
                 WINDOW2_ACTIVE = False
                 window1.UnHide()
                 break
-
+    
     if event1 == "Open a pack" and not WINDOW3_ACTIVE:
         if OSYS == "windows":
             COMMAND = f"cmd.exe dir {root}/instances/"
@@ -101,6 +106,10 @@ while True:
         WINDOW3_ACTIVE = True
         window1.Hide()
         window3 = sg.Window("Listing existing packs", pack_list)
+
+
+        # EVENT3 - Open existing packs
+
         while True:
             event3, values3 = window3.read()
             # Existing modify window close check
@@ -131,6 +140,9 @@ while True:
                 WINDOW4_ACTIVE = True
                 window3.hide()
                 window4 = sg.Window("Editing Pack", pack_edit)
+
+                # EVENT4
+
                 while True:
                     event4, values4 = window4.read()
                     # Editing window close check
