@@ -141,7 +141,7 @@ while True:
                 window3.hide()
                 window4 = sg.Window("Editing Pack", pack_edit)
 
-                # EVENT4
+                # EVENT4 - Editing Packs
 
                 while True:
                     event4, values4 = window4.read()
@@ -178,6 +178,9 @@ while True:
                         WINDOW4_ACTIVE = False
                         window4.Hide()
                         WINDOW5_ACTIVE = True
+
+                        # EVENT5 - Mod listing
+
                         while True:
                             event5, values5 = window5.read()
                             # Mods list close check
