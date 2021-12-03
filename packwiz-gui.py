@@ -101,7 +101,7 @@ while True:
         pack_list = [
                     [sg.Text(instances_list)],
                     [sg.Text("Pack Name to open: "), sg.InputText()],
-                    [sg.Button("Open")], [sg.Button("Close")]
+                    [sg.Button("Open")], [sg.Button("Delete (WARNING: CANNOT BE UNDONE)")], [sg.Button("Close")]
                     ]
         WINDOW3_ACTIVE = True
         window1.Hide()
@@ -140,6 +140,13 @@ while True:
                 WINDOW4_ACTIVE = True
                 window3.hide()
                 window4 = sg.Window("Editing Pack", pack_edit)
+
+            if event3 == "Delete (WARNING: CANNOT BE UNDONE)":
+                name = values3[0]
+                pack_root = f"{root}/instances/{name}_pack"
+                os.rmdir(f"{pack_root}")
+                print(f"Pack {name} deleted.")
+
 
                 # EVENT4 - Editing Packs
 
