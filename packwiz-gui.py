@@ -140,7 +140,6 @@ while True:
                             [sg.Button("Remove Mod")],
                             [sg.Button("View Installed Mods")],
                             [sg.Button("Export to CF pack")],
-                            [sg.Text("Pack zip ready in opened directory")],
                             [sg.Text("")],
                             [sg.Button("Close")],
                             ]
