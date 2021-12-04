@@ -2,8 +2,8 @@
 import os
 import platform
 from subprocess import PIPE, Popen
-import PySimpleGUI as sg
 from shutil import rmtree
+import PySimpleGUI as sg
 
 root = os.getcwd()
 sg.theme("DarkGrey9") # Add a touch of color
@@ -31,6 +31,9 @@ elif platform.system() == "Darwin" or "Linux":
 window1 = sg.Window("Main Menu", main_menu)
 WINDOW2_ACTIVE = False
 WINDOW3_ACTIVE = False
+WINDOW4_ACTIVE = False
+WINDOW5_ACTIVE = False
+WINDOW6_ACTIVE = False
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
@@ -39,7 +42,7 @@ while True:
     if event1 in (sg.WIN_CLOSED, "Close packwiz-gui"):
         window1.close()
         break
-    
+
 
     # EVENT1 - Main Menu
 
@@ -58,7 +61,7 @@ while True:
         WINDOW2_ACTIVE = True
         window1.Hide()
         window2 = sg.Window("Creating a new pack", pack_create)
-        
+
         # EVENT2 - Creating a new pack
 
         while True:
@@ -81,11 +84,12 @@ while True:
                 os.mkdir(pack_root)
                 os.chdir(pack_root)
                 os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
+
                 window2.close()
                 WINDOW2_ACTIVE = False
                 window1.UnHide()
                 break
-    
+
     if event1 == "Open a pack" and not WINDOW3_ACTIVE:
         if OSYS == "windows":
             COMMAND = f"cmd.exe dir {root}/instances/"
@@ -102,7 +106,9 @@ while True:
         pack_list = [
                     [sg.Text(instances_list)],
                     [sg.Text("Pack Name to open: "), sg.InputText()],
-                    [sg.Button("Open")], [sg.Button("Delete (WARNING: CANNOT BE UNDONE)")], [sg.Button("Close")]
+                    [sg.Button("Open")],
+                    [sg.Button("Close")],
+                    [sg.Button("Delete", button_color=("red"))],
                     ]
         WINDOW3_ACTIVE = True
         window1.Hide()
@@ -120,31 +126,36 @@ while True:
                 window1.UnHide()
                 break
 
-            WINDOW4_ACTIVE = False
-
-            if event3 == "Delete (WARNING: CANNOT BE UNDONE)":
+            if event3 == "Delete" and not WINDOW6_ACTIVE:
                 name = values3[0]
                 pack_root = f"{root}/instances/{name}_pack"
                 delete_dialog = [
-                                [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA. WE ARE NOT RESPONSIBLE FOR ANY OF YOUR PACK'S DATA LOSS. ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE? ")],
+                                [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA. ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
                                 [sg.Button("Yes"), sg.Button("No")]
                                 ]
+                window3.Hide()
+                WINDOW3_ACTIVE = False
+                WINDOW6_ACTIVE = True
                 window6 = sg.Window("Are you sure?", delete_dialog)
 
-            while True:
-                event6, values6 = window6.read()
-                # Existing modify window close check
-                if event6 in (sg.WIN_CLOSED, "No"):
-                    window6.close()
-                    WINDOW6_ACTIVE = False
-                    break
-                if event6 == "Yes":
-                    rmtree(f"{pack_root}")
-                    print(f"Pack {name} deleted.")
+                while True:
+                    event6, values6 = window6.read()
+                    # Existing modify window close check
+                    if event6 in (sg.WIN_CLOSED, "No"):
+                        window6.close()
+                        WINDOW6_ACTIVE = False
+                        window3.UnHide()
+                        WINDOW6_ACTIVE = True
+                        break
+                    if event6 == "Yes":
+                        rmtree(f"{pack_root}")
+                        print(f"Pack {name} deleted.")
 
-                    window6.close()
-                    WINDOW6_ACTIVE = False
-                    break
+                        window6.close()
+                        WINDOW6_ACTIVE = False
+                        window3.UnHide()
+                        WINDOW6_ACTIVE = True
+                        break
 
             if event3 == "Open" and not WINDOW4_ACTIVE:
                 name = values3[0]
@@ -183,7 +194,6 @@ while True:
                         mod_url = "\"" + values4[1] + "\""
                         os.chdir(f"{root}/instances/{name}_pack")
                         os.system(f"{packwiz} {source_type} install {mod_url}")
-                    WINDOW5_ACTIVE = False
                     if event4 == "View Installed Mods" and not WINDOW5_ACTIVE:
                         if OSYS == "windows":
                             COMMAND = "cmd.exe dir"
