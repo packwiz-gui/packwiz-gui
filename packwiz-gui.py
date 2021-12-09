@@ -45,7 +45,6 @@ while True:
         main_menu_window.close()
         break
 
-
     # Main Menu
 
     if main_menu_event == "Create a new pack" and not PACK_CREATE_WINDOW_ACTIVE:
@@ -54,7 +53,7 @@ while True:
                       [sg.Text("Author:"), sg.InputText()],
                       [sg.Text("Pack Version:"), sg.InputText()],
                       [sg.Text("Minecraft Version:"), sg.InputText()],
-                      [sg.Text("Modloader"), sg.Combo(["forge", "fabric"])],
+                      [sg.Text("Modloader:"), sg.Combo(["forge", "fabric"])],
                       [sg.Text("Modloader Version:"), sg.InputText()],
                       [sg.Button("Create")],
                       [sg.Button("Close")],
@@ -102,7 +101,6 @@ while True:
             COMMAND = f"cmd.exe dir {root}/instances/"
         elif OSYS == "unix":
             COMMAND = f"ls {root}/instances/ | grep _pack"
-        #status, output = commands.getstatusoutput(f"{COMMAND} {root}/instances")
         process = Popen(
         args=COMMAND,
         stdout=PIPE,
@@ -112,7 +110,7 @@ while True:
         instances_list = process.stdout.read().decode("utf-8")
         pack_list = [
                     [sg.Text(instances_list)],
-                    [sg.Text("Pack Name to open: "), sg.InputText()],
+                    [sg.Text("Pack Name:"), sg.InputText()],
                     [sg.Button("Open")],
                     [sg.Button("Close")],
                     [sg.Button("Delete", button_color=("red"))],
@@ -121,8 +119,7 @@ while True:
         main_menu_window.Hide()
         pack_list_window = sg.Window("Listing existing packs", pack_list)
 
-
-        # EVENT3 - Open existing packs
+        # Open existing packs
 
         while True:
             pack_list_event, pack_list_values = pack_list_window.read()
@@ -142,8 +139,10 @@ while True:
                                 ]
                 pack_list_window.Hide()
                 PACK_LIST_WINDOW_ACTIVE = False
-                PACK_DELETE_WINDOW_ACTIVE = True
                 pack_delete_window = sg.Window("Are you sure?", delete_dialog)
+                PACK_DELETE_WINDOW_ACTIVE = True
+
+                # Deleting pack
 
                 while True:
                     pack_delete_event, pack_delete_values = pack_delete_window.read()
@@ -152,8 +151,9 @@ while True:
                         pack_delete_window.Close()
                         PACK_DELETE_WINDOW_ACTIVE = False
                         pack_list_window.UnHide()
-                        PACK_DELETE_WINDOW_ACTIVE = True
+                        PACK_LIST_WINDOW_ACTIVE = True
                         break
+
                     if pack_delete_event == "Yes":
                         os.chdir(root)
                         rmtree(f"{pack_root}")
@@ -188,7 +188,7 @@ while True:
                 pack_edit_window = sg.Window("Editing Pack", pack_edit)
 
 
-                # EVENT4 - Editing Packs
+                # Editing Packs
 
                 while True:
                     pack_edit_event, pack_edit_values = pack_edit_window.read()
@@ -225,7 +225,7 @@ while True:
                         pack_edit_window.Hide()
                         MOD_LIST_WINDOW_ACTIVE = True
 
-                        # EVENT5 - Mod listing
+                        # Mod listing
 
                         while True:
                             mod_list_event, mod_list_values = mod_list_window.read()
