@@ -27,15 +27,15 @@ elif platform.system() == "Darwin" or "Linux":
     os.system(f"chmod +x {packwiz}")
     OSYS = "unix"
 
-# Create the Window
-main_menu_window = sg.Window("Main Menu", main_menu)
-
-MAIN_MENU_WINDOW_ACTIVE = True
 PACK_CREATE_WINDOW_ACTIVE = False
 PACK_LIST_WINDOW_ACTIVE = False
 PACK_EDIT_WINDOW_ACTIVE = False
 MOD_LIST_WINDOW_ACTIVE = False
 PACK_DELETE_WINDOW_ACTIVE = False
+
+# Create the Window
+main_menu_window = sg.Window("Main Menu", main_menu)
+MAIN_MENU_WINDOW_ACTIVE = True
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
@@ -59,10 +59,11 @@ while True:
                       [sg.Button("Close")],
                       [sg.Text("")],
                       ]
-        PACK_CREATE_WINDOW_ACTIVE = True
+
         main_menu_window.Hide()
         MAIN_MENU_WINDOW_ACTIVE = False
         pack_create_window = sg.Window("Creating a new pack", pack_create)
+        PACK_CREATE_WINDOW_ACTIVE = True
 
         # Creating a new pack
 
@@ -115,9 +116,11 @@ while True:
                     [sg.Button("Close")],
                     [sg.Button("Delete", button_color=("red"))],
                     ]
-        PACK_LIST_WINDOW_ACTIVE = True
+
         main_menu_window.Hide()
+        MAIN_MENU_WINDOW_ACTIVE = False
         pack_list_window = sg.Window("Listing existing packs", pack_list)
+        PACK_LIST_WINDOW_ACTIVE = True
 
         # Open existing packs
 
@@ -128,6 +131,7 @@ while True:
                 pack_list_window.close()
                 PACK_LIST_WINDOW_ACTIVE = False
                 main_menu_window.UnHide()
+                MAIN_MENU_WINDOW_ACTIVE = True
                 break
 
             if pack_list_event == "Delete" and not PACK_DELETE_WINDOW_ACTIVE:
@@ -162,7 +166,7 @@ while True:
                         pack_delete_window.close()
                         PACK_DELETE_WINDOW_ACTIVE = False
                         pack_list_window.close()
-                        PACK_DELETE_WINDOW_ACTIVE = False
+                        PACK_LIST_WINDOW_ACTIVE = False
                         main_menu_window.UnHide()
                         MAIN_MENU_WINDOW_ACTIVE = True
                         break
@@ -182,11 +186,10 @@ while True:
                             [sg.Text("")],
                             [sg.Button("Close")],
                             ]
-                PACK_LIST_WINDOW_ACTIVE = False
-                PACK_EDIT_WINDOW_ACTIVE = True
                 pack_list_window.hide()
+                PACK_LIST_WINDOW_ACTIVE = False
                 pack_edit_window = sg.Window("Editing Pack", pack_edit)
-
+                PACK_EDIT_WINDOW_ACTIVE = True
 
                 # Editing Packs
 
@@ -221,9 +224,9 @@ while True:
                                               [sg.Button("Close")]
                                               ]
                         mod_list_window = sg.Window("Listing installed mods", list_installed_mods)
-                        PACK_EDIT_WINDOW_ACTIVE = False
-                        pack_edit_window.Hide()
                         MOD_LIST_WINDOW_ACTIVE = True
+                        pack_edit_window.Hide()
+                        PACK_EDIT_WINDOW_ACTIVE = False
 
                         # Mod listing
 
@@ -233,8 +236,8 @@ while True:
                             if mod_list_event in (sg.WIN_CLOSED, "Close"):
                                 mod_list_window.close()
                                 MOD_LIST_WINDOW_ACTIVE = False
-                                PACK_EDIT_WINDOW_ACTIVE = True
                                 pack_edit_window.UnHide()
+                                PACK_EDIT_WINDOW_ACTIVE = True
                                 break
                     if pack_edit_event == "Remove Mod":
                         mod_url = pack_edit_values[1]
