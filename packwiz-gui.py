@@ -1,24 +1,13 @@
 #!/bin/env python3
+
 import os
 import platform
 from subprocess import PIPE, Popen
 from shutil import rmtree
+import webbrowser
 import PySimpleGUI as sg
 
 root = os.getcwd()
-sg.theme("DarkGrey9") # Add a touch of color
-#right_click_menu=sg.MENU_RIGHT_CLICK_EDITME_VER_EXIT
-# All the stuff inside your window.
-main_menu = [
-            [sg.Text("")],
-            [sg.Button("Create a new pack")],
-            [sg.Text("")],
-            [sg.Button("Open a pack")],
-            [sg.Text("")],
-            [sg.Button("Close packwiz-gui")]
-            ]
-
-
 if platform.system() == "Windows":
     packwiz = f"{root}\\bin\\packwiz.exe"
     OSYS = "windows"
@@ -27,11 +16,32 @@ elif platform.system() == "Darwin" or "Linux":
     os.system(f"chmod +x {packwiz}")
     OSYS = "unix"
 
+sg.theme("DarkGrey9") # Add a touch of color
+
+if os.path.isdir("./instances") == False:
+    os.mkdir("./instances")
+if os.path.isdir("./bin") == False:
+    os.mkdir("./bin")
+
 PACK_CREATE_WINDOW_ACTIVE = False
 PACK_LIST_WINDOW_ACTIVE = False
 PACK_EDIT_WINDOW_ACTIVE = False
 MOD_LIST_WINDOW_ACTIVE = False
 PACK_DELETE_WINDOW_ACTIVE = False
+
+#right_click_menu=sg.MENU_RIGHT_CLICK_EDITME_VER_EXIT
+
+# All the stuff inside your window.
+main_menu = [
+            [sg.Text("")],
+            [sg.Button("Create a new pack")],
+            [sg.Text("")],
+            [sg.Button("Open a pack")],
+            [sg.Text("")],
+            [sg.Button("Download packwiz")],
+            [sg.Text("")],
+            [sg.Button("Close packwiz-gui")]
+            ]
 
 # Create the Window
 main_menu_window = sg.Window("Main Menu", main_menu)
@@ -43,6 +53,7 @@ while True:
     # Main menu close check
     if main_menu_event in (sg.WIN_CLOSED, "Close packwiz-gui"):
         main_menu_window.close()
+        MAIN_MENU_WINDOW_ACTIVE = False
         break
 
     # Main Menu
@@ -251,3 +262,9 @@ while True:
                             os.system(f"finder {pack_root}")
                         elif platform.system() == "Linux":
                             os.system(f"xdg-open {pack_root}")
+
+    if main_menu_event == "Download packwiz":
+        if OSYS == "unix":
+            os.system("xdg-open https://github.com/comp500/packwiz/#installation")
+        if OSYS == "windows":
+            webbrowser.get(windows-default).open("https://github.com/comp500/packwiz/#installation")
