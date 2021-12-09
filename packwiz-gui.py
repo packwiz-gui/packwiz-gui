@@ -53,9 +53,9 @@ MAIN_MENU_WINDOW_ACTIVE = True
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
     main_menu_event, main_menu_values = main_menu_window.read()
-    # Main menu close check
+    # Main menu Close check
     if main_menu_event in (sg.WIN_CLOSED, "Close packwiz-gui"):
-        main_menu_window.close()
+        main_menu_window.Close()
         MAIN_MENU_WINDOW_ACTIVE = False
         break
 
@@ -83,13 +83,12 @@ while True:
 
         while True:
             pack_create_event, pack_create_values = pack_create_window.read()
-            # New pack window close check
+            # New pack window Close check
             if pack_create_event in (sg.WIN_CLOSED, "Close"):
-                pack_create_window.close()
+                pack_create_window.Close()
                 PACK_CREATE_WINDOW_ACTIVE = False
                 main_menu_window.UnHide()
                 MAIN_MENU_WINDOW_ACTIVE = True
-
                 break
 
             if pack_create_event == "Create":
@@ -106,7 +105,7 @@ while True:
                     os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
                     os.chdir(root)
 
-                    pack_create_window.close()
+                    pack_create_window.Close()
                     PACK_CREATE_WINDOW_ACTIVE = False
                     main_menu_window.UnHide()
                     MAIN_MENU_WINDOW_ACTIVE = True
@@ -143,9 +142,9 @@ while True:
 
         while True:
             pack_list_event, pack_list_values = pack_list_window.read()
-            # Existing modify window close check
+            # Existing modify window Close check
             if pack_list_event in (sg.WIN_CLOSED, "Close"):
-                pack_list_window.close()
+                pack_list_window.Close()
                 PACK_LIST_WINDOW_ACTIVE = False
                 main_menu_window.UnHide()
                 MAIN_MENU_WINDOW_ACTIVE = True
@@ -169,7 +168,7 @@ while True:
 
                         while True:
                             pack_delete_event, pack_delete_values = pack_delete_window.read()
-                            # Existing modify window close check
+                            # Existing modify window Close check
                             if pack_delete_event in (sg.WIN_CLOSED, "No"):
                                 pack_delete_window.Close()
                                 PACK_DELETE_WINDOW_ACTIVE = False
@@ -182,9 +181,9 @@ while True:
                                 rmtree(f"{pack_root}")
                                 print(f"Pack {name} deleted.")
 
-                                pack_delete_window.close()
+                                pack_delete_window.Close()
                                 PACK_DELETE_WINDOW_ACTIVE = False
-                                pack_list_window.close()
+                                pack_list_window.Close()
                                 PACK_LIST_WINDOW_ACTIVE = False
                                 main_menu_window.UnHide()
                                 MAIN_MENU_WINDOW_ACTIVE = True
@@ -211,7 +210,7 @@ while True:
                                     [sg.Text("")],
                                     [sg.Button("Close")],
                                     ]
-                        pack_list_window.hide()
+                        pack_list_window.Hide()
                         PACK_LIST_WINDOW_ACTIVE = False
                         pack_edit_window = sg.Window("Editing Pack", pack_edit)
                         PACK_EDIT_WINDOW_ACTIVE = True
@@ -220,9 +219,9 @@ while True:
 
                         while True:
                             pack_edit_event, pack_edit_values = pack_edit_window.read()
-                            # Editing window close check
+                            # Editing window Close check
                             if pack_edit_event in (sg.WIN_CLOSED, "Close"):
-                                pack_edit_window.close()
+                                pack_edit_window.Close()
                                 PACK_EDIT_WINDOW_ACTIVE = False
                                 pack_list_window.UnHide()
                                 PACK_LIST_WINDOW_ACTIVE = True
@@ -257,9 +256,9 @@ while True:
 
                                 while True:
                                     mod_list_event, mod_list_values = mod_list_window.read()
-                                    # Mods list close check
+                                    # Mods list Close check
                                     if mod_list_event in (sg.WIN_CLOSED, "Close"):
-                                        mod_list_window.close()
+                                        mod_list_window.Close()
                                         MOD_LIST_WINDOW_ACTIVE = False
                                         pack_edit_window.UnHide()
                                         PACK_EDIT_WINDOW_ACTIVE = True
