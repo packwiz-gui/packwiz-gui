@@ -1,5 +1,3 @@
-!bin/.bin
 bin/*
-!instances/.instances
 instances/*
 packwiz-gui-qt.py
