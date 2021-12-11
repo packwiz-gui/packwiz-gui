@@ -1,0 +1,63 @@
+name: cx_freeze
+on: [push]
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install deps
+        run: python3 -m pip install cx_freeze PySimpleGUI PySimpleGUIQt
+
+      - name: Compile tkinter
+        run: cxfreeze packwiz_gui.py
+
+      - name: Upload tkinter artifacts
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui-linux-tkinter
+          path: ./build
+
+      - name: Cleanup
+        run: mv build build-tkinter
+
+      - name: Patch into Qt
+        run: patch packwiz_gui.py unix-qt-patch.patch -o packwiz_gui_qt.py
+
+      - name: Compile Qt
+        run: cxfreeze packwiz_gui_qt.py
+
+      - name: Upload Qt artifacts
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui-linux-qt
+          path: ./build
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install deps
+        run: python3 -m pip install cx_freeze PySimpleGUI
+
+      - name: Compile tkinter
+        run: cxfreeze packwiz_gui.py
+
+      - name: Upload tkinter artifacts
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui-windows-tkinter
+          path: ./build

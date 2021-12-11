@@ -7,32 +7,27 @@ from shutil import rmtree
 import webbrowser
 import PySimpleGUI as sg
 
+sg.theme("DarkGrey9")  # Add a touch of color
+
 root = os.getcwd()
 if platform.system() == "Windows":
     packwiz = f"{root}\\bin\\packwiz.exe"
-    OSYS = "windows"
-elif platform.system() == "Darwin" or "Linux":
+else:
     packwiz = f"{root}/bin/packwiz"
     os.system(f"chmod +x {packwiz}")
-    OSYS = "unix"
 
-sg.theme("DarkGrey9") # Add a touch of color
-
-if os.path.isdir("./instances") == False:
+if not os.path.isdir("./instances"):
     os.mkdir("./instances")
-if os.path.isdir("./bin") == False:
+if not os.path.isdir("./bin"):
     os.mkdir("./bin")
-
-PACK_DOESNT_EXIST = "That pack does not exist!"
-PACK_EXISTS = "That pack already exists!"
+if not os.path.isfile("./bin/packwiz"):
+    print("Packwiz does not exist! Please download packwiz and put it in the bin folder!")
 
 PACK_CREATE_WINDOW_ACTIVE = False
 PACK_LIST_WINDOW_ACTIVE = False
 PACK_EDIT_WINDOW_ACTIVE = False
 MOD_LIST_WINDOW_ACTIVE = False
 PACK_DELETE_WINDOW_ACTIVE = False
-
-#right_click_menu=sg.MENU_RIGHT_CLICK_EDITME_VER_EXIT
 
 # All the stuff inside your window.
 main_menu = [
@@ -69,8 +64,7 @@ while True:
                       [sg.Text("Minecraft Version:"), sg.InputText()],
                       [sg.Text("Modloader:"), sg.Combo(["forge", "fabric"])],
                       [sg.Text("Modloader Version:"), sg.InputText()],
-                      [sg.Button("Create")],
-                      [sg.Button("Close")],
+                      [sg.Button("Create"), sg.Button("Close")],
                       [sg.Text("")],
                       ]
 
@@ -94,7 +88,7 @@ while True:
             if pack_create_event == "Create":
                 name = pack_create_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if os.path.isdir(pack_root) == False:
+                if not os.path.isdir(pack_root):
                     author = pack_create_values[1]
                     pack_version = pack_create_values[2]
                     mc_version = pack_create_values[3]
@@ -111,26 +105,20 @@ while True:
                     MAIN_MENU_WINDOW_ACTIVE = True
                     break
                 else:
-                    print(PACK_EXISTS)
+                    print(f"The pack \"{name}\" already exists!")
 
     if main_menu_event == "Open a pack" and not PACK_LIST_WINDOW_ACTIVE:
-        if OSYS == "windows":
+        if platform.system() == "Windows":
             COMMAND = f"cmd.exe dir {root}/instances/"
-        elif OSYS == "unix":
+        else:
             COMMAND = f"ls {root}/instances/"
-        process = Popen(
-        args=COMMAND,
-        stdout=PIPE,
-        stderr=PIPE,
-        shell=True)
-
-        instances_list = process.stdout.read().decode("utf-8")
+        instances_list = Popen(args=COMMAND, stdout=PIPE, stderr=PIPE, shell=True).stdout.read().decode("utf-8")
         pack_list = [
                     [sg.Text(instances_list)],
                     [sg.Text("Pack Name:"), sg.InputText()],
                     [sg.Button("Open")],
                     [sg.Button("Close")],
-                    [sg.Button("Delete", button_color=("red"))],
+                    [sg.Button("Delete", button_color="red")],
                     ]
 
         main_menu_window.Hide()
@@ -153,10 +141,12 @@ while True:
             if pack_list_event == "Delete" and not PACK_DELETE_WINDOW_ACTIVE:
                 name = pack_list_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if os.path.isdir(pack_root) == True:
-                    if os.path.isfile(f"{pack_root}/pack.toml") == True:
+                if os.path.isdir(pack_root):
+                    if os.path.isfile(f"{pack_root}/pack.toml"):
                         delete_dialog = [
-                                        [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA. ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
+                                        [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA.")],
+                                        [sg.Text("ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
+                                        [sg.Text("")],
                                         [sg.Button("Yes"), sg.Button("No")]
                                         ]
                         pack_list_window.Hide()
@@ -189,9 +179,9 @@ while True:
                                 MAIN_MENU_WINDOW_ACTIVE = True
                                 break
                     else:
-                        print(PACK_DOESNT_EXIST)
+                        print(f"The pack \"{name}\" does not exist!")
                 else:
-                    print(PACK_DOESNT_EXIST)
+                    print(f"The pack \"{name}\" does not exist!")
 
             if pack_list_event == "Open" and not PACK_EDIT_WINDOW_ACTIVE:
                 name = pack_list_values[0]
@@ -228,41 +218,24 @@ while True:
                                 break
                             if pack_edit_event == "Add Mod":
                                 source_type = pack_edit_values[0]
-                                mod_url = "\"" + pack_edit_values[1] + "\""
-                                os.chdir(f"{root}/instances/{name}")
+                                mod_url = pack_edit_values[1]
+                                os.chdir(pack_root)
                                 os.system(f"{packwiz} {source_type} install {mod_url}")
                             if pack_edit_event == "View Installed Mods" and not MOD_LIST_WINDOW_ACTIVE:
-                                if OSYS == "windows":
-                                    COMMAND = "cmd.exe dir"
-                                elif OSYS == "unix":
-                                    COMMAND = "ls"
-                                cmd = f"{COMMAND} {pack_root}/mods"
-                                process = Popen(
-                                    args=cmd,
-                                    stdout=PIPE,
-                                    stderr=PIPE,
-                                    shell=True)
-                                mods_list = process.stdout.read().decode("utf-8")
+                                if platform.system() == "Windows":
+                                    COMMAND = f"cmd.exe dir {pack_root}/mods"
+                                else:
+                                    COMMAND = f"ls {pack_root}/mods"
+                                mods_list = Popen(args=COMMAND, stdout=PIPE, stderr=PIPE, shell=True).stdout.read().decode("utf-8")
                                 list_installed_mods = [
-                                                    [sg.Text(mods_list)],
-                                                    [sg.Button("Close")]
-                                                    ]
+                                                      [sg.Text(mods_list)],
+                                                      [sg.Button("Close")]
+                                                      ]
                                 mod_list_window = sg.Window("Listing installed mods", list_installed_mods)
                                 MOD_LIST_WINDOW_ACTIVE = True
-                                pack_edit_window.Hide()
-                                PACK_EDIT_WINDOW_ACTIVE = False
-
-                                # Mod listing
-
-                                while True:
-                                    mod_list_event, mod_list_values = mod_list_window.read()
-                                    # Mods list Close check
-                                    if mod_list_event in (sg.WIN_CLOSED, "Close"):
-                                        mod_list_window.Close()
-                                        MOD_LIST_WINDOW_ACTIVE = False
-                                        pack_edit_window.UnHide()
-                                        PACK_EDIT_WINDOW_ACTIVE = True
-                                        break
+                                mod_list_event, mod_list_values = mod_list_window.read()
+                                mod_list_window.Close()
+                                MOD_LIST_WINDOW_ACTIVE = False
                             if pack_edit_event == "Remove Mod":
                                 mod_url = pack_edit_values[1]
                                 os.chdir(f"{pack_root}")
@@ -276,12 +249,12 @@ while True:
                                 elif platform.system() == "Linux":
                                     os.system(f"xdg-open {pack_root}")
                     else:
-                        print(PACK_DOESNT_EXIST)
+                        print(f"The pack \"{name}\" does not exist!")
                 else:
-                    print(PACK_DOESNT_EXIST)
+                    print(f"The pack \"{name}\" does not exist!")
 
     if main_menu_event == "Download packwiz":
-        if OSYS == "unix":
-            os.system("xdg-open https://github.com/comp500/packwiz/#installation")
-        if OSYS == "windows":
+        if platform.system() == "Windows":
             webbrowser.get(windows-default).open("https://github.com/comp500/packwiz/#installation")
+        else:
+            webbrowser.open("https://github.com/comp500/packwiz/#installation")
