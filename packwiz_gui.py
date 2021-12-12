@@ -1,15 +1,24 @@
 #!/bin/env python3
 
+import logging
 import os
 import platform
-from subprocess import PIPE, Popen
-from shutil import rmtree
+import sys
 import webbrowser
+from shutil import rmtree
+from subprocess import PIPE, Popen
+
 import PySimpleGUI as sg
 
 sg.theme("DarkGrey9")  # Add a touch of color
 
+logging_file_handler = logging.FileHandler(filename='log.txt')
+logging_stdout_handler = logging.StreamHandler(sys.stdout)
+logging_handlers = [logging_file_handler, logging_stdout_handler]
+logging.basicConfig(handlers=logging_handlers, level=15)
+
 root = os.getcwd()
+
 if platform.system() == "Windows":
     packwiz = f"{root}\\bin\\packwiz.exe"
 else:
@@ -18,10 +27,12 @@ else:
 
 if not os.path.isdir("./instances"):
     os.mkdir("./instances")
+    logging.warning(msg="No instances folder, creating...")
 if not os.path.isdir("./bin"):
     os.mkdir("./bin")
+    logging.warning(msg="No bin folder, creating...")
 if not os.path.isfile("./bin/packwiz"):
-    print("Packwiz does not exist! Please download packwiz and put it in the bin folder!")
+    logging.critical(msg="Packwiz does not exist! Please download packwiz and put it in the bin folder!")
 
 PACK_CREATE_WINDOW_ACTIVE = False
 PACK_LIST_WINDOW_ACTIVE = False
@@ -34,7 +45,7 @@ main_menu = [
             [sg.Text("")],
             [sg.Button("Create a new pack")],
             [sg.Text("")],
-            [sg.Button("Open a pack")],
+            [sg.Button("Modify a pack")],
             [sg.Text("")],
             [sg.Button("Download packwiz")],
             [sg.Text("")],
@@ -96,8 +107,14 @@ while True:
                     modloader_version = pack_create_values[5]
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
-                    os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
+                    pack_create_command_success = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
                     os.chdir(root)
+
+                    if pack_create_command_success != 0:
+                        logging.error(msg=f"There was an error creating the pack (name: \"{name}\")!")
+                        os.rmdir(pack_root)
+                    else:
+                        logging.info(msg=f"Pack \"{name}\" created.")
 
                     pack_create_window.Close()
                     PACK_CREATE_WINDOW_ACTIVE = False
@@ -105,14 +122,17 @@ while True:
                     MAIN_MENU_WINDOW_ACTIVE = True
                     break
                 else:
-                    print(f"The pack \"{name}\" already exists!")
+                    logging.warning(msg=f"The pack \"{name}\" already exists!")
 
-    if main_menu_event == "Open a pack" and not PACK_LIST_WINDOW_ACTIVE:
+    if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
         if platform.system() == "Windows":
             COMMAND = f"cmd.exe dir {root}/instances/"
         else:
             COMMAND = f"ls {root}/instances/"
-        instances_list = Popen(args=COMMAND, stdout=PIPE, stderr=PIPE, shell=True).stdout.read().decode("utf-8")
+        instances_list = Popen(args=COMMAND,
+                               stdout=PIPE,
+                               stderr=PIPE,
+                               shell=True).stdout.read().decode("utf-8")
         pack_list = [
                     [sg.Text(instances_list)],
                     [sg.Text("Pack Name:"), sg.InputText()],
@@ -169,7 +189,7 @@ while True:
                             if pack_delete_event == "Yes":
                                 os.chdir(root)
                                 rmtree(f"{pack_root}")
-                                print(f"Pack {name} deleted.")
+                                logging.info(msg=f"Pack {name} deleted.")
 
                                 pack_delete_window.Close()
                                 PACK_DELETE_WINDOW_ACTIVE = False
@@ -179,9 +199,9 @@ while True:
                                 MAIN_MENU_WINDOW_ACTIVE = True
                                 break
                     else:
-                        print(f"The pack \"{name}\" does not exist!")
+                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
                 else:
-                    print(f"The pack \"{name}\" does not exist!")
+                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
 
             if pack_list_event == "Open" and not PACK_EDIT_WINDOW_ACTIVE:
                 name = pack_list_values[0]
@@ -217,16 +237,23 @@ while True:
                                 PACK_LIST_WINDOW_ACTIVE = True
                                 break
                             if pack_edit_event == "Add Mod":
-                                source_type = pack_edit_values[0]
-                                mod_url = pack_edit_values[1]
+                                source = pack_edit_values[0]
+                                mod = pack_edit_values[1]
                                 os.chdir(pack_root)
-                                os.system(f"{packwiz} {source_type} install {mod_url}")
+                                mod_add_command = os.system(f"{packwiz} {source} install {mod}")
+                                if mod_add_command != 0:
+                                    logging.error(msg=f"There was an error adding mod {mod} from source {source}!")
+                                else:
+                                    logging.info(msg=f"Successfully added mod {mod} from source {source}!")
                             if pack_edit_event == "View Installed Mods" and not MOD_LIST_WINDOW_ACTIVE:
                                 if platform.system() == "Windows":
                                     COMMAND = f"cmd.exe dir {pack_root}/mods"
                                 else:
                                     COMMAND = f"ls {pack_root}/mods"
-                                mods_list = Popen(args=COMMAND, stdout=PIPE, stderr=PIPE, shell=True).stdout.read().decode("utf-8")
+                                mods_list = Popen(args=COMMAND,
+                                                  stdout=PIPE,
+                                                  stderr=PIPE,
+                                                  shell=True).stdout.read().decode("utf-8")
                                 list_installed_mods = [
                                                       [sg.Text(mods_list)],
                                                       [sg.Button("Close")]
@@ -241,7 +268,9 @@ while True:
                                 os.chdir(f"{pack_root}")
                                 os.system(f"{packwiz} remove {mod_url}")
                             if pack_edit_event == "Export to CF pack":
-                                os.system(f"{packwiz} cf export")
+                                pack_export_command = os.system(f"{packwiz} cf export")
+                                if pack_export_command != 0:
+                                    logging.error(msg=f"There was an error exporting the pack (name: \"{name}\")!")
                                 if platform.system() == "Windows":
                                     os.system(f"explorer.exe {pack_root}")
                                 elif platform.system() == "Darwin":
@@ -249,12 +278,12 @@ while True:
                                 elif platform.system() == "Linux":
                                     os.system(f"xdg-open {pack_root}")
                     else:
-                        print(f"The pack \"{name}\" does not exist!")
+                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
                 else:
-                    print(f"The pack \"{name}\" does not exist!")
+                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
 
     if main_menu_event == "Download packwiz":
         if platform.system() == "Windows":
-            webbrowser.get(windows-default).open("https://github.com/comp500/packwiz/#installation")
+            webbrowser.get("windows-default").open("https://github.com/comp500/packwiz/#installation")
         else:
             webbrowser.open("https://github.com/comp500/packwiz/#installation")
