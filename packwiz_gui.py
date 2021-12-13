@@ -108,6 +108,11 @@ while True:
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
                     pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
+                    os.system(f"echo *.zip >> .packwizignore")
+                    os.system(f"echo .git/** >>.packwizignore")
+                    os.system(f"git init")
+                    os.system(f"git add .")
+                    os.system(f"git commit -m \"Create pack {name}\"")
                     os.chdir(root)
 
                     if pack_create_command != 0:
@@ -125,14 +130,17 @@ while True:
                     logging.warning(msg=f"The pack \"{name}\" already exists!")
 
     if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
-        if platform.system() == "Windows":
-            COMMAND = f"dir {root}/instances/"
-        else:
-            COMMAND = f"ls {root}/instances/"
-        instances_list = Popen(args=COMMAND,
-                               stdout=PIPE,
-                               stderr=PIPE,
-                               shell=True).stdout.read().decode("utf-8")
+        instances_list = ""
+        #if platform.system() == "Windows":
+            #COMMAND = f"dir {root}/instances/"
+        #else:
+            #COMMAND = f"ls {root}/instances/"
+        #instances_list = Popen(args=COMMAND,
+                               #stdout=PIPE,
+                               #stderr=PIPE,
+                               #shell=True).stdout.read().decode("utf-8")
+        for n in os.listdir(f"{root}/instances"):
+            instances_list = instances_list + n + "\n"
         pack_list = [
                     [sg.Text(instances_list)],
                     [sg.Text("Pack Name:"), sg.InputText()],
