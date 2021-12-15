@@ -10,19 +10,30 @@ from subprocess import PIPE, Popen
 import getopt
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "t:", ["theme=", "qt"])
+    opts, args = getopt.getopt(sys.argv[1:], "t:hv", ["theme=", "qt", "help", "verbose"])
 except getopt.GetoptError:
-    print("Usage: --theme <theme> --qt")
+    print("Error: Unknown flag.\nUse --help to see available commands.")
     sys.exit()
 
 THEMESET = ""
 QTSET = False
+LOGLEVEL = 15
 
 for opt, arg in opts:
     if opt == "--qt":
         QTSET = True
     if opt in ("--theme", "-t"):
         THEMESET = arg
+    if opt in ("-h", "--help"):
+        print("")
+        print("  -t, --theme, <theme>:              Pick a custom theme.")
+        print("      --qt:                          Use Qt instead of tkinter. Requires PySimpleGUIQt.")
+        print("  -h, --help:                        This help message.")
+        print("  -v, --verbose:                     More verbose logging.")
+        print("")
+        sys.exit()
+    if opt in ("-v", "--verbose"):
+        LOGLEVEL = 10
 
 if QTSET:
     if platform.system() == "Windows":
@@ -53,7 +64,7 @@ else:
 logging_file_handler = logging.FileHandler(filename='log.txt')
 logging_stdout_handler = logging.StreamHandler(sys.stdout)
 logging_handlers = [logging_file_handler, logging_stdout_handler]
-logging.basicConfig(handlers=logging_handlers, level=15)
+logging.basicConfig(handlers=logging_handlers, level=LOGLEVEL)
 
 root = os.getcwd()
 
