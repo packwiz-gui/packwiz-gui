@@ -14,3 +14,7 @@ python3 you can double-click to start it, though it's not recommended).
 ## Command line flags
 
 Use --help for help
+
+## Building into executable
+
+To turn packwiz-gui into an executable, use cx_freeze or pyinstaller. The github actions builds may or may not work.
