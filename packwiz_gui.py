@@ -25,11 +25,11 @@ else:
     packwiz = f"{root}/bin/packwiz"
     os.system(f"chmod +x {packwiz}")
 
-if not os.path.isdir("./instances"):
-    os.mkdir("./instances")
+if not os.path.isdir(f"{root}/instances"):
+    os.mkdir("{root}/instances")
     logging.warning(msg="No instances folder, creating...")
-if not os.path.isdir("./bin"):
-    os.mkdir("./bin")
+if not os.path.isdir(f"{root}/bin"):
+    os.mkdir("{root}/bin")
     logging.warning(msg="No bin folder, creating...")
 if not os.path.isfile(packwiz):
     logging.critical(msg="Packwiz does not exist! Please download packwiz and put it in the bin folder!")
