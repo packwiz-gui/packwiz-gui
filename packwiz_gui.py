@@ -1,16 +1,54 @@
 #!/bin/env python3
 
-import logging
 import os
 import platform
 import sys
+import logging
 import webbrowser
 from shutil import rmtree
 from subprocess import PIPE, Popen
+import getopt
 
-import PySimpleGUI as sg
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "t:", ["theme=", "qt"])
+except getopt.GetoptError:
+    print("Usage: --theme <theme> --qt")
+    sys.exit()
 
-sg.theme("DarkGrey9")  # Add a touch of color
+THEMESET = ""
+QTSET = False
+
+for opt, arg in opts:
+    if opt == "--qt":
+        QTSET = True
+    if opt in ("--theme", "-t"):
+        THEMESET = arg
+
+if QTSET:
+    if platform.system() == "Windows":
+        print("Error: Cannot use Qt on Windows")
+        sys.exit()
+    else:
+        try:
+            import PySimpleGUIQt as sg
+        except ModuleNotFoundError:
+            print("You must install PySimpleGUIQt!")
+            sys.exit()
+else:
+    try:
+        import PySimpleGUI as sg
+    except ModuleNotFoundError:
+        print("You must install PySimpleGUI!")
+        sys.exit()
+
+
+if THEMESET == "":
+    if QTSET:
+        sg.theme("SystemDefaultForReal")
+    else:
+        sg.theme("DarkGrey9")
+else:
+    sg.theme(THEMESET)
 
 logging_file_handler = logging.FileHandler(filename='log.txt')
 logging_stdout_handler = logging.StreamHandler(sys.stdout)
@@ -26,10 +64,10 @@ else:
     os.system(f"chmod +x {packwiz}")
 
 if not os.path.isdir(f"{root}/instances"):
-    os.mkdir("{root}/instances")
+    os.mkdir(f"{root}/instances")
     logging.warning(msg="No instances folder, creating...")
 if not os.path.isdir(f"{root}/bin"):
-    os.mkdir("{root}/bin")
+    os.mkdir(f"{root}/bin")
     logging.warning(msg="No bin folder, creating...")
 if not os.path.isfile(packwiz):
     logging.critical(msg="Packwiz does not exist! Please download packwiz and put it in the bin folder!")
@@ -108,15 +146,15 @@ while True:
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
                     pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                    os.system(f"echo *.zip >> .packwizignore")
-                    os.system(f"echo .git/** >>.packwizignore")
-                    os.system(f"git init")
-                    os.system(f"git add .")
+                    os.system("echo *.zip >> .packwizignore")
+                    os.system("echo .git/** >>.packwizignore")
+                    os.system("git init")
+                    os.system("git add .")
                     os.system(f"git commit -m \"Create pack {name}\"")
                     os.chdir(root)
 
                     if pack_create_command != 0:
-                        logging.error(msg=f"There was an error creating the pack (name: \"{name}\")!")
+                        logging.error(msg=f"There was an error creating the pack \"{name}\"!")
                         os.rmdir(pack_root)
                     else:
                         logging.info(msg=f"Pack \"{name}\" created.")
@@ -131,14 +169,6 @@ while True:
 
     if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
         instances_list = ""
-        #if platform.system() == "Windows":
-            #COMMAND = f"dir {root}/instances/"
-        #else:
-            #COMMAND = f"ls {root}/instances/"
-        #instances_list = Popen(args=COMMAND,
-                               #stdout=PIPE,
-                               #stderr=PIPE,
-                               #shell=True).stdout.read().decode("utf-8")
         for n in os.listdir(f"{root}/instances"):
             instances_list = instances_list + n + "\n"
         pack_list = [

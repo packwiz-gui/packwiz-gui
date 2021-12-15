@@ -11,6 +11,6 @@ in the `bin` folder (created when you start packwiz-gui).
 python3 you can double-click to start it, though it's not recommended).
 5. Enjoy!
 
-Linux and Mac users: If you want packwiz-gui to integrate with your Linux Qt/KDE theme or MacOS, run 
-`patch packwiz_gui.py unix-qt-patch.patch -o packwiz_gui_qt.py` and use the new `packwiz-gui-qt.py` file.
-Also, install `PySimpleGUIQt` using `pip3 install PySimpleGUIQt`.
+## Command line flags
+
+Use --help for help

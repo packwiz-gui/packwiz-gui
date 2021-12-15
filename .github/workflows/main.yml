@@ -15,28 +15,13 @@ jobs:
       - name: Install deps
         run: python3 -m pip install cx_freeze PySimpleGUI PySimpleGUIQt
 
-      - name: Compile tkinter
+      - name: Compile
         run: cxfreeze packwiz_gui.py
 
-      - name: Upload tkinter artifacts
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: packwiz_gui-linux-tkinter
-          path: ./build
-
-      - name: Cleanup
-        run: mv build build-tkinter
-
-      - name: Patch into Qt
-        run: patch packwiz_gui.py unix-qt-patch.patch -o packwiz_gui_qt.py
-
-      - name: Compile Qt
-        run: cxfreeze packwiz_gui_qt.py
-
-      - name: Upload Qt artifacts
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: packwiz_gui-linux-qt
+          name: packwiz_gui-linux
           path: ./build
 
   build-windows:
