@@ -10,7 +10,7 @@ from subprocess import PIPE, Popen
 import getopt
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "t:hv", ["theme=", "qt", "help", "verbose"])
+    opts, args = getopt.getopt(sys.argv[1:], "t:hvg", ["theme=", "qt", "help", "verbose", "git"])
 except getopt.GetoptError:
     print("Error: Unknown flag.\nUse --help to see available commands.")
     sys.exit()
@@ -18,6 +18,7 @@ except getopt.GetoptError:
 THEMESET = ""
 QTSET = False
 LOGLEVEL = 15
+GITSET = False
 
 for opt, arg in opts:
     if opt == "--qt":
@@ -34,6 +35,8 @@ for opt, arg in opts:
         sys.exit()
     if opt in ("-v", "--verbose"):
         LOGLEVEL = 10
+    if opt in ("-g", "--git"):
+        GITSET = True
 
 if QTSET:
     if platform.system() == "Windows":
@@ -51,8 +54,6 @@ else:
     except ModuleNotFoundError:
         print("You must install PySimpleGUI!")
         sys.exit()
-
-
 if THEMESET == "":
     if QTSET:
         sg.theme("SystemDefaultForReal")
@@ -159,9 +160,9 @@ while True:
                     pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
                     os.system("echo *.zip >> .packwizignore")
                     os.system("echo .git/** >>.packwizignore")
-                    os.system("git init")
-                    os.system("git add .")
-                    os.system(f"git commit -m \"Create pack {name}\"")
+                    if GITSET: os.system("git init")
+                    if GITSET: os.system("git add .")
+                    if GITSET: os.system(f"git commit -m \"Create pack {name}\"")
                     os.chdir(root)
 
                     if pack_create_command != 0:
@@ -295,6 +296,8 @@ while True:
                                     logging.error(msg=f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
                                 else:
                                     logging.info(msg=f"Successfully added mod \"{mod}\" from source \"{source}\".")
+                                    if GITSET: os.system("git add .")
+                                    if GITSET: os.system(f"git commit -m \"Added {mod}\"")
 
                             if pack_edit_event == "View Installed Mods" and not MOD_LIST_WINDOW_ACTIVE:
                                 if platform.system() == "Windows":
@@ -323,6 +326,8 @@ while True:
                                     logging.error(msg=f"There was an error removing mod \"{mod}\"!")
                                 else:
                                     logging.info(msg=f"Mod \"{mod}\" successfully removed.")
+                                    if GITSET: os.system("git add .")
+                                    if GITSET: os.system(f"git commit -m \"Removed {mod}\"")
 
                             if pack_edit_event == "Export to CF pack":
                                 pack_export_command = os.system(f"{packwiz} cf export")
@@ -330,6 +335,8 @@ while True:
                                     logging.error(msg=f"There was an error exporting the pack \"{name}\"!")
                                 else:
                                     logging.info(msg=f"Pack \"{name}\" successfully exported.")
+                                    if GITSET: os.system("git add .")
+                                    if GITSET: os.system(f"git commit -m \"Exported pack {name}\"")
                                     if platform.system() == "Windows":
                                         os.startfile(pack_root)
                                     elif platform.system() == "Darwin":
