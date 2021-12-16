@@ -1,5 +1,6 @@
-bin/*
-instances/*
+bin/
+instances/
 packwiz_gui_qt.py
-.idea
-__pycache__
+.idea/
+__pycache__/
+log.txt
