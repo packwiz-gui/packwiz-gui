@@ -10,7 +10,7 @@ import getopt
 import toml
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "t:hvg", ["theme=", "qt", "help", "verbose", "debug", "git", "bin"])
+    opts, args = getopt.getopt(sys.argv[1:], "t:qhvgb", ["theme=", "qt", "help", "verbose", "debug", "git", "bin"])
 except getopt.GetoptError:
     print("Error: Unknown flag.\nUse --help to see available commands.")
     sys.exit()
@@ -22,17 +22,17 @@ GITSET = False
 BINARY = False
 
 for opt, arg in opts:
-    if opt == "--qt":
-        QTSET = True
     if opt in ("--theme", "-t"):
         THEMESET = arg
+    if opt in ("-q", "--qt"):
+        QTSET = True
     if opt in ("-h", "--help"):
         print("")
         print("  -t, --theme, <theme>:              - Pick a custom theme.")
-        print("      --qt:                          - Use Qt instead of tkinter. Requires PySimpleGUIQt.")
+        print("  -q, --qt:                          - Use Qt instead of tkinter. Requires PySimpleGUIQt.")
         print("  -h, --help:                        - This help message.")
         print("  -v, --verbose, --debug:            - More verbose logging.")
-        print("  --bin:                             - Run in binary mode. If you run this script without this flag as a binary, it will crash.")
+        print("  -b, --bin:                         - Run in binary mode. If you run this script without this flag as a binary, it will crash.")
         print("                                       This may cause unknown bugs.")
         print("")
         sys.exit()
@@ -40,7 +40,7 @@ for opt, arg in opts:
         LOGLEVEL = 10
     if opt in ("-g", "--git"):
         GITSET = True
-    if opt == "--bin":
+    if opt in ("-b", "--bin"):
         BINARY = True
 
 if QTSET:
