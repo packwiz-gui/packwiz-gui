@@ -1,6 +1,5 @@
+__pycache__/
+.idea/
 bin/
 instances/
-packwiz_gui_qt.py
-.idea/
-__pycache__/
 log.txt
