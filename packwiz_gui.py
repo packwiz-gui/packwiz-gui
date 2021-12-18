@@ -10,7 +10,7 @@ import getopt
 import toml
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "t:hvg", ["theme=", "qt", "help", "verbose", "debug", "git"])
+    opts, args = getopt.getopt(sys.argv[1:], "t:qhvgb", ["theme=", "qt", "help", "verbose", "debug", "git", "bin"])
 except getopt.GetoptError:
     print("Error: Unknown flag.\nUse --help to see available commands.")
     sys.exit()
@@ -19,24 +19,29 @@ THEMESET = ""
 QTSET = False
 LOGLEVEL = 15
 GITSET = False
+BINARY = False
 
 for opt, arg in opts:
-    if opt == "--qt":
-        QTSET = True
     if opt in ("--theme", "-t"):
         THEMESET = arg
+    if opt in ("-q", "--qt"):
+        QTSET = True
     if opt in ("-h", "--help"):
         print("")
-        print("  -t, --theme, <theme>:              Pick a custom theme.")
-        print("      --qt:                          Use Qt instead of tkinter. Requires PySimpleGUIQt.")
-        print("  -h, --help:                        This help message.")
-        print("  -v, --verbose, --debug:            More verbose logging.")
+        print("  -t, --theme, <theme>:              - Pick a custom theme.")
+        print("  -q, --qt:                          - Use Qt instead of tkinter. Requires PySimpleGUIQt.")
+        print("  -h, --help:                        - This help message.")
+        print("  -v, --verbose, --debug:            - More verbose logging.")
+        print("  -b, --bin:                         - Run in binary mode. If you run this script without this flag as a binary, it will crash.")
+        print("                                       This may cause unknown bugs.")
         print("")
         sys.exit()
     if opt in ("-v", "--verbose", "--debug"):
         LOGLEVEL = 10
     if opt in ("-g", "--git"):
         GITSET = True
+    if opt in ("-b", "--bin"):
+        BINARY = True
 
 if QTSET:
     if platform.system() == "Windows":
@@ -62,12 +67,16 @@ if THEMESET == "":
 else:
     sg.theme(THEMESET)
 
-logging_file_handler = logging.FileHandler(filename='log.txt')
+if not BINARY:
+    root = sys.path[0]
+else:
+    root = os.getcwd()
+
+logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
 logging_stdout_handler = logging.StreamHandler(sys.stdout)
 logging_handlers = [logging_file_handler, logging_stdout_handler]
 logging.basicConfig(handlers=logging_handlers, level=LOGLEVEL)
 
-root = sys.path[0]
 logging.debug(msg=f"root dir is {root}")
 
 if platform.system() == "Windows":
