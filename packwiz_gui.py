@@ -238,6 +238,7 @@ while True:
                                     [sg.Button("Remove Mod")],
                                     [sg.Button("View Installed Mods")],
                                     [sg.Button("Export to CF pack")],
+                                    [sg.Button("Refresh pack")],
                                     [sg.Text("")],
                                     [sg.Text("Pack name:"), sg.InputText(pack_toml["name"])],
                                     [sg.Text("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
@@ -323,6 +324,15 @@ while True:
                                         os.system(f"open {pack_root}")
                                     else:
                                         os.system(f"xdg-open {pack_root}")
+
+                            if pack_edit_event == "Refresh pack":
+                                packwiz_refresh = os.system(f"{packwiz} refresh")
+                                if packwiz_refresh != 0:
+                                    logging.error(msg="There was an error refreshing the pack!")
+                                    logging.debug(msg=f"error code {packwiz_refresh}")
+                                else:
+                                    logging.info(msg="Successfully refreshed pack.")
+
 
                             if pack_edit_event == "Change":
                                 pack_toml["name"] = pack_edit_values[2]
