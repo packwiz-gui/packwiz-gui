@@ -239,6 +239,8 @@ while True:
                                     [sg.Button("View Installed Mods")],
                                     [sg.Button("Export to CF pack")],
                                     [sg.Button("Refresh pack")],
+                                    [sg.Button("Update all mods")],
+                                    [sg.Button("Update mod: "), sg.InputText()],
                                     [sg.Text("")],
                                     [sg.Text("Pack name:"), sg.InputText(pack_toml["name"])],
                                     [sg.Text("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
@@ -271,10 +273,14 @@ while True:
 
                             if pack_edit_event == "Add Mod":
                                 os.chdir(pack_root)
-                                mod_add_command = os.system(f"{packwiz} {source} install {mod}")
-                                if mod_add_command != 0:
+                                mod_add_command = f"{packwiz} {source} install {mod}"
+                                if platform.system() == "Windows":
+                                    mod_add_command_execute = os.system(f"cmd /c \"{mod_add_command}\"")
+                                else:
+                                    mod_add_command_execute = os.system(f"bash -c \"{mod_add_command}\"")
+                                if mod_add_command_execute != 0:
                                     logging.error(msg=f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
-                                    logging.debug(msg=f"error code {mod_add_command}")
+                                    logging.debug(msg=f"error code {mod_add_command_execute}")
                                 else:
                                     logging.info(msg=f"Successfully added mod \"{mod}\" from source \"{source}\".")
                                     if GITSET:
@@ -333,6 +339,28 @@ while True:
                                 else:
                                     logging.info(msg="Successfully refreshed pack.")
 
+                            if pack_edit_event == "Update all mods":
+
+                                command_update_all = f"{packwiz} update -a"
+                                if platform.system() == "Windows":
+                                    packwiz_update_all = os.system(f"cmd /c \"{command_update_all}\"")
+                                else:
+                                    packwiz_update_all = os.system(f"bash -c \"{command_update_all}\"")
+                                if packwiz_update_all != 0:
+                                    logging.error(msg="There was an error updating all mods")
+                                else:
+                                    logging.info(msg="Updating all mods succeeded")
+
+                            if pack_edit_event == "Update mod: ":
+                                command_update_mod = f"{packwiz} update {pack_edit_values[1]}"
+                                if platform.system() == "Windows":
+                                    packwiz_update_mod = os.system(f"cmd /c \"{command_update_mod}\"")
+                                else:
+                                    packwiz_update_mod = os.system(f"bash -c \"{command_update_mod}\"")
+                                if packwiz_update_mod != 0:
+                                    logging.error(msg="There was an error updating your mod(s)")
+                                else:
+                                    logging.info(msg="Updating your mod(s) succeeded")
 
                             if pack_edit_event == "Change":
                                 pack_toml["name"] = pack_edit_values[2]
