@@ -161,7 +161,9 @@ while True:
             if pack_create_event == "Create":
                 name = pack_create_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if not os.path.isdir(pack_root):
+                if os.path.isdir(pack_root):
+                    logging.warning(msg=f"The pack \"{name}\" already exists!")
+                else:
                     author = pack_create_values[1]
                     pack_version = pack_create_values[2]
                     mc_version = pack_create_values[3]
@@ -191,8 +193,6 @@ while True:
                     main_menu_window.UnHide()
                     MAIN_MENU_WINDOW_ACTIVE = True
                     break
-                else:
-                    logging.warning(msg=f"The pack \"{name}\" already exists!")
 
     if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
         instances_list = ""
@@ -226,8 +226,12 @@ while True:
             if pack_list_event == "Open" and not PACK_EDIT_WINDOW_ACTIVE:
                 name = pack_list_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if os.path.isdir(pack_root):
-                    if os.path.isfile(f"{pack_root}/pack.toml"):
+                if not os.path.isdir(pack_root):
+                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                else:
+                    if not os.path.isfile(f"{pack_root}/pack.toml"):
+                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                    else:
                         os.chdir(pack_root)
                         pack_toml = toml.load("pack.toml")
                         pack_edit = [
@@ -352,16 +356,15 @@ while True:
                                 else:
                                     logging.info(msg="Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
 
-                    else:
-                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
-                else:
-                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
-
             if pack_list_event == "Delete" and not PACK_DELETE_WINDOW_ACTIVE:
                 name = pack_list_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if os.path.isdir(pack_root):
-                    if os.path.isfile(f"{pack_root}/pack.toml"):
+                if not os.path.isdir(pack_root):
+                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                else:
+                    if not os.path.isfile(f"{pack_root}/pack.toml"):
+                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                    else:
                         pack_delete = [
                                       [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA.")],
                                       [sg.Text("ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
@@ -395,10 +398,6 @@ while True:
                                 main_menu_window.UnHide()
                                 MAIN_MENU_WINDOW_ACTIVE = True
                                 break
-                    else:
-                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
-                else:
-                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
 
     if main_menu_event == "Download packwiz":
         if platform.system() == "Windows":
