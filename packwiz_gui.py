@@ -4,9 +4,9 @@ import os
 import platform
 import sys
 import logging
+import getopt
 import webbrowser
 import shutil
-import getopt
 import toml
 
 try:
@@ -277,14 +277,10 @@ while True:
 
                             if pack_edit_event == "Add Mod":
                                 os.chdir(pack_root)
-                                mod_add_command = f"{packwiz} {source} install {mod}"
-                                if platform.system() == "Windows":
-                                    mod_add_command_execute = os.system(f"cmd /c \"{mod_add_command}\"")
-                                else:
-                                    mod_add_command_execute = os.system(f"bash -c \"{mod_add_command}\"")
-                                if mod_add_command_execute != 0:
+                                mod_add_command = os.system(f"{packwiz} {source} install {mod}")
+                                if mod_add_command != 0:
                                     logging.error(msg=f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
-                                    logging.debug(msg=f"error code {mod_add_command_execute}")
+                                    logging.debug(msg=f"error code {mod_add_command}")
                                 else:
                                     logging.info(msg=f"Successfully added mod \"{mod}\" from source \"{source}\".")
                                     if GITSET:
