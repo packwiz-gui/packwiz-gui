@@ -383,45 +383,42 @@ while True:
             if pack_list_event == "Delete" and not PACK_DELETE_WINDOW_ACTIVE:
                 name = pack_list_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if not os.path.isdir(pack_root):
+                if not os.path.isfile(f"{pack_root}/pack.toml"):
                     logging.warning(msg=f"The pack \"{name}\" does not exist!")
                 else:
-                    if not os.path.isfile(f"{pack_root}/pack.toml"):
-                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
-                    else:
-                        pack_delete = [
-                                      [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA.")],
-                                      [sg.Text("ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
-                                      [sg.Text("")],
-                                      [sg.Button("Yes"), sg.Button("No")]
-                                      ]
-                        pack_list_window.Close()
-                        PACK_LIST_WINDOW_ACTIVE = False
-                        pack_delete_window = sg.Window("Are you sure?", pack_delete)
-                        PACK_DELETE_WINDOW_ACTIVE = True
+                    pack_delete = [
+                                  [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA.")],
+                                  [sg.Text("ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
+                                  [sg.Text("")],
+                                  [sg.Button("Yes"), sg.Button("No")]
+                                  ]
+                    pack_list_window.Close()
+                    PACK_LIST_WINDOW_ACTIVE = False
+                    pack_delete_window = sg.Window("Are you sure?", pack_delete)
+                    PACK_DELETE_WINDOW_ACTIVE = True
 
-                        # Deleting pack
+                    # Deleting pack
 
-                        while True:
-                            pack_delete_event, pack_delete_values = pack_delete_window.read()
-                            # Existing modify window Close check
-                            if pack_delete_event in (sg.WIN_CLOSED, "No"):
-                                pack_delete_window.Close()
-                                PACK_DELETE_WINDOW_ACTIVE = False
-                                main_menu_window.UnHide()
-                                MAIN_MENU_WINDOW_ACTIVE = True
-                                break
+                    while True:
+                        pack_delete_event, pack_delete_values = pack_delete_window.read()
+                        # Existing modify window Close check
+                        if pack_delete_event in (sg.WIN_CLOSED, "No"):
+                            pack_delete_window.Close()
+                            PACK_DELETE_WINDOW_ACTIVE = False
+                            main_menu_window.UnHide()
+                            MAIN_MENU_WINDOW_ACTIVE = True
+                            break
 
-                            if pack_delete_event == "Yes":
-                                os.chdir(root)
-                                shutil.rmtree(f"{pack_root}")
-                                logging.info(msg=f"Pack {name} deleted.")
+                        if pack_delete_event == "Yes":
+                            os.chdir(root)
+                            shutil.rmtree(f"{pack_root}")
+                            logging.info(msg=f"Pack {name} deleted.")
 
-                                pack_delete_window.Close()
-                                PACK_DELETE_WINDOW_ACTIVE = False
-                                main_menu_window.UnHide()
-                                MAIN_MENU_WINDOW_ACTIVE = True
-                                break
+                            pack_delete_window.Close()
+                            PACK_DELETE_WINDOW_ACTIVE = False
+                            main_menu_window.UnHide()
+                            MAIN_MENU_WINDOW_ACTIVE = True
+                            break
 
     if main_menu_event == "Download packwiz":
         if platform.system() == "Windows":
