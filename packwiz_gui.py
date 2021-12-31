@@ -148,51 +148,40 @@ while True:
 
         # Creating a new pack
 
-        while True:
-            pack_create_event, pack_create_values = pack_create_window.read()
-            # New pack window Close check
-            if pack_create_event in (sg.WIN_CLOSED, "Close"):
+        pack_create_event, pack_create_values = pack_create_window.read()
+        if pack_create_event == "Create":
+            name = pack_create_values[0]
+            pack_root = f"{root}/instances/{name}"
+            if os.path.isdir(pack_root):
+                logging.warning(msg=f"The pack \"{name}\" already exists!")
+            else:
+                author = pack_create_values[1]
+                pack_version = pack_create_values[2]
+                mc_version = pack_create_values[3]
+                modloader = pack_create_values[4]
+                modloader_version = pack_create_values[5]
+                os.mkdir(pack_root)
+                os.chdir(pack_root)
+                pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
+                os.system("echo *.zip >> .packwizignore")
+                os.system("echo .git/** >>.packwizignore")
+                os.mkdir("mods")
+                if GITSET:
+                    os.system("git init")
+                    os.system("git add .")
+                    os.system(f"git commit -m \"Create pack {name}\"")
+                os.chdir(root)
+                if pack_create_command != 0:
+                    logging.error(msg=f"There was an error creating the pack \"{name}\"!")
+                    logging.debug(msg=f"error code {pack_create_command}")
+                    os.rmdir(pack_root)
+                else:
+                    logging.info(msg=f"Pack \"{name}\" created.")
                 pack_create_window.Close()
                 PACK_CREATE_WINDOW_ACTIVE = False
                 main_menu_window.UnHide()
                 MAIN_MENU_WINDOW_ACTIVE = True
                 break
-
-            if pack_create_event == "Create":
-                name = pack_create_values[0]
-                pack_root = f"{root}/instances/{name}"
-                if os.path.isdir(pack_root):
-                    logging.warning(msg=f"The pack \"{name}\" already exists!")
-                else:
-                    author = pack_create_values[1]
-                    pack_version = pack_create_values[2]
-                    mc_version = pack_create_values[3]
-                    modloader = pack_create_values[4]
-                    modloader_version = pack_create_values[5]
-                    os.mkdir(pack_root)
-                    os.chdir(pack_root)
-                    pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                    os.system("echo *.zip >> .packwizignore")
-                    os.system("echo .git/** >>.packwizignore")
-                    os.mkdir("mods")
-                    if GITSET:
-                        os.system("git init")
-                        os.system("git add .")
-                        os.system(f"git commit -m \"Create pack {name}\"")
-                    os.chdir(root)
-
-                    if pack_create_command != 0:
-                        logging.error(msg=f"There was an error creating the pack \"{name}\"!")
-                        logging.debug(msg=f"error code {pack_create_command}")
-                        os.rmdir(pack_root)
-                    else:
-                        logging.info(msg=f"Pack \"{name}\" created.")
-
-                    pack_create_window.Close()
-                    PACK_CREATE_WINDOW_ACTIVE = False
-                    main_menu_window.UnHide()
-                    MAIN_MENU_WINDOW_ACTIVE = True
-                    break
 
     if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
         instances_list = ""
@@ -214,13 +203,9 @@ while True:
         # Open existing packs
 
         pack_list_event, pack_list_values = pack_list_window.read()
-        # Existing modify window Close check
         if pack_list_event == "Open" and not PACK_EDIT_WINDOW_ACTIVE:
             name = pack_list_values[0]
             pack_root = f"{root}/instances/{name}"
-            #if not os.path.isdir(pack_root):
-                #logging.warning(msg=f"The pack \"{name}\" does not exist!")
-            #else:
             if not os.path.isfile(f"{pack_root}/pack.toml"):
                 logging.warning(msg=f"The pack \"{name}\" does not exist!")
             else:
@@ -380,7 +365,6 @@ while True:
                 # Deleting pack
 
                 pack_delete_event, pack_delete_values = pack_delete_window.read()
-                # Existing modify window Close check
                 if pack_delete_event == "Yes":
                     os.chdir(root)
                     shutil.rmtree(f"{pack_root}")
