@@ -140,7 +140,6 @@ while True:
                       [sg.Button("Create"), sg.Button("Close")],
                       [sg.Text("")],
                       ]
-
         main_menu_window.Hide()
         MAIN_MENU_WINDOW_ACTIVE = False
         pack_create_window = sg.Window("Creating a new pack", pack_create)
@@ -177,11 +176,10 @@ while True:
                     os.rmdir(pack_root)
                 else:
                     logging.info(msg=f"Pack \"{name}\" created.")
-                pack_create_window.Close()
-                PACK_CREATE_WINDOW_ACTIVE = False
-                main_menu_window.UnHide()
-                MAIN_MENU_WINDOW_ACTIVE = True
-                break
+        pack_create_window.Close()
+        PACK_CREATE_WINDOW_ACTIVE = False
+        main_menu_window.UnHide()
+        MAIN_MENU_WINDOW_ACTIVE = True
 
     if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
         instances_list = ""
@@ -246,8 +244,6 @@ while True:
                     if pack_edit_event in (sg.WIN_CLOSED, "Close"):
                         pack_edit_window.Close()
                         PACK_EDIT_WINDOW_ACTIVE = False
-                        main_menu_window.UnHide()
-                        MAIN_MENU_WINDOW_ACTIVE = True
                         break
                     if pack_edit_event == "Add Mod":
                         os.chdir(pack_root)
@@ -371,9 +367,6 @@ while True:
                     logging.info(msg=f"Pack {name} deleted.")
                 pack_delete_window.Close()
                 PACK_DELETE_WINDOW_ACTIVE = False
-                main_menu_window.UnHide()
-                MAIN_MENU_WINDOW_ACTIVE = True
-                break
         pack_list_window.Close()
         PACK_LIST_WINDOW_ACTIVE = False
         main_menu_window.UnHide()
