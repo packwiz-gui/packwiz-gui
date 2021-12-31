@@ -152,9 +152,8 @@ while True:
                 os.mkdir(pack_root)
                 os.chdir(pack_root)
                 pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                pwignore = open(".packwizignore", "w")
-                pwignore.write("*.zip\n.git/**")
-                pwignore.close()
+                with open(".packwizignore", "w", encoding="utf8") as pwignore:
+                    pwignore.write("*.zip\n.git/**")
                 os.mkdir("mods")
                 if GITSET:
                     os.system("git init")
@@ -171,12 +170,12 @@ while True:
         main_menu_window.UnHide()
 
     if main_menu_event == "Modify a pack":
-        instances_list = ""
+        INSTANCES_LIST = ""
         for n in os.listdir(f"{root}/instances"):
-            instances_list = instances_list + n + "\n"
+            INSTANCES_LIST = INSTANCES_LIST + n + "\n"
         pack_list = [
                     [sg.Text("Packs:")],
-                    [sg.Text(instances_list)],
+                    [sg.Text(INSTANCES_LIST)],
                     [sg.Text("Pack Name:"), sg.InputText(key="packname")],
                     [sg.Button("Open")],
                     [sg.Button("Close")],
@@ -252,11 +251,11 @@ while True:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Removed {mod}\"")
                     if pack_edit_event == "View Installed Mods":
-                        mods_list = ""
+                        MODS_LIST = ""
                         for n in os.listdir(f"{pack_root}/mods"):
-                            mods_list = mods_list + n + "\n"
+                            MODS_LIST = MODS_LIST + n + "\n"
                         mod_list = [
-                                   [sg.Text(mods_list)],
+                                   [sg.Text(MODS_LIST)],
                                    [sg.Button("Close")]
                                    ]
                         mod_list_window = sg.Window("Listing installed mods", mod_list)
@@ -310,13 +309,12 @@ while True:
                         pack_toml["author"] = pack_edit_values["author"]
                         pack_toml["version"] = pack_edit_values["version"]
                         pack_toml["versions"]["minecraft"] = pack_edit_values["minecraftversion"]
-                        pack_toml_file = open("pack.toml", "w")
-                        toml.dump(pack_toml, pack_toml_file)
-                        pack_toml_file.close()
+                        with open("pack.toml", "w", encoding="utf8") as pack_toml_file:
+                            toml.dump(pack_toml, pack_toml_file)
                         packwiz_refresh = os.system(f"{packwiz} refresh")
                         if GITSET:
                             os.system("git add .")
-                            os.system(f"git commit -m \"Modify pack details\"")
+                            os.system("git commit -m \"Modify pack details\"")
                         if packwiz_refresh != 0:
                             logging.error(msg="There was an error changing the pack details!")
                             logging.debug(msg=f"error code {packwiz_refresh}")
