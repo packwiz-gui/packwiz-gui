@@ -379,25 +379,17 @@ while True:
 
                 # Deleting pack
 
-                while True:
-                    pack_delete_event, pack_delete_values = pack_delete_window.read()
-                    # Existing modify window Close check
-                    if pack_delete_event in (sg.WIN_CLOSED, "No"):
-                        pack_delete_window.Close()
-                        PACK_DELETE_WINDOW_ACTIVE = False
-                        main_menu_window.UnHide()
-                        MAIN_MENU_WINDOW_ACTIVE = True
-                        break
-
-                    if pack_delete_event == "Yes":
-                        os.chdir(root)
-                        shutil.rmtree(f"{pack_root}")
-                        logging.info(msg=f"Pack {name} deleted.")
-                        pack_delete_window.Close()
-                        PACK_DELETE_WINDOW_ACTIVE = False
-                        main_menu_window.UnHide()
-                        MAIN_MENU_WINDOW_ACTIVE = True
-                        break
+                pack_delete_event, pack_delete_values = pack_delete_window.read()
+                # Existing modify window Close check
+                if pack_delete_event == "Yes":
+                    os.chdir(root)
+                    shutil.rmtree(f"{pack_root}")
+                    logging.info(msg=f"Pack {name} deleted.")
+                pack_delete_window.Close()
+                PACK_DELETE_WINDOW_ACTIVE = False
+                main_menu_window.UnHide()
+                MAIN_MENU_WINDOW_ACTIVE = True
+                break
         pack_list_window.Close()
         PACK_LIST_WINDOW_ACTIVE = False
         main_menu_window.UnHide()
