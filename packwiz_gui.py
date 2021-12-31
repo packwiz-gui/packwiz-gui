@@ -123,12 +123,12 @@ while True:
 
     if main_menu_event == "Create a new pack":
         pack_create = [
-                      [sg.Text("Pack name:"), sg.InputText()],
-                      [sg.Text("Author:"), sg.InputText()],
-                      [sg.Text("Pack Version:"), sg.InputText()],
-                      [sg.Text("Minecraft Version:"), sg.InputText()],
-                      [sg.Text("Modloader:"), sg.Combo(["forge", "fabric"])],
-                      [sg.Text("Modloader Version:"), sg.InputText()],
+                      [sg.Text("Pack name:"), sg.InputText(key="name")],
+                      [sg.Text("Author:"), sg.InputText(key="author")],
+                      [sg.Text("Pack Version:"), sg.InputText(key="version")],
+                      [sg.Text("Minecraft Version:"), sg.InputText(key="minecraftversion")],
+                      [sg.Text("Modloader:"), sg.Combo(["forge", "fabric"], key="modloader")],
+                      [sg.Text("Modloader Version:"), sg.InputText(key="modloaderversion")],
                       [sg.Button("Create"), sg.Button("Close")],
                       [sg.Text("")],
                       ]
@@ -139,16 +139,16 @@ while True:
 
         pack_create_event, pack_create_values = pack_create_window.read()
         if pack_create_event == "Create":
-            name = pack_create_values[0]
+            name = pack_create_values["name"]
             pack_root = f"{root}/instances/{name}"
             if os.path.isdir(pack_root):
                 logging.warning(msg=f"The pack \"{name}\" already exists!")
             else:
-                author = pack_create_values[1]
-                pack_version = pack_create_values[2]
-                mc_version = pack_create_values[3]
-                modloader = pack_create_values[4]
-                modloader_version = pack_create_values[5]
+                author = pack_create_values["author"]
+                pack_version = pack_create_values["version"]
+                mc_version = pack_create_values["minecraftversion"]
+                modloader = pack_create_values["modloader"]
+                modloader_version = pack_create_values["modloaderversion"]
                 os.mkdir(pack_root)
                 os.chdir(pack_root)
                 pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
@@ -177,7 +177,7 @@ while True:
         pack_list = [
                     [sg.Text("Packs:")],
                     [sg.Text(instances_list)],
-                    [sg.Text("Pack Name:"), sg.InputText()],
+                    [sg.Text("Pack Name:"), sg.InputText(key="packname")],
                     [sg.Button("Open")],
                     [sg.Button("Close")],
                     [sg.Button("Delete", button_color="red")],
@@ -190,7 +190,7 @@ while True:
         pack_list_event, pack_list_values = pack_list_window.read()
         pack_list_window.close()
         if pack_list_event == "Open":
-            name = pack_list_values[0]
+            name = pack_list_values["packname"]
             pack_root = f"{root}/instances/{name}"
             if not os.path.isfile(f"{pack_root}/pack.toml"):
                 logging.warning(msg=f"The pack \"{name}\" does not exist!")
@@ -324,7 +324,7 @@ while True:
                             logging.info(msg="Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
 
         if pack_list_event == "Delete":
-            name = pack_list_values[0]
+            name = pack_list_values["packname"]
             pack_root = f"{root}/instances/{name}"
             if not os.path.isfile(f"{pack_root}/pack.toml"):
                 logging.warning(msg=f"The pack \"{name}\" does not exist!")
