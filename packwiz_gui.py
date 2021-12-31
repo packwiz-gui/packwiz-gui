@@ -142,7 +142,7 @@ while True:
             name = pack_create_values["name"]
             pack_root = f"{root}/instances/{name}"
             if os.path.isdir(pack_root):
-                logging.warning(msg=f"The pack \"{name}\" already exists!")
+                print(f"The pack \"{name}\" already exists!")
             else:
                 author = pack_create_values["author"]
                 pack_version = pack_create_values["version"]
@@ -161,11 +161,11 @@ while True:
                     os.system(f"git commit -m \"Create pack {name}\"")
                 os.chdir(root)
                 if pack_create_command != 0:
-                    logging.error(msg=f"There was an error creating the pack \"{name}\"!")
+                    print(f"There was an error creating the pack \"{name}\"!")
                     logging.debug(msg=f"error code {pack_create_command}")
-                    os.rmdir(pack_root)
+                    shutil.rmtree(pack_root)
                 else:
-                    logging.info(msg=f"Pack \"{name}\" created.")
+                    print(f"Pack \"{name}\" created.")
         pack_create_window.close()
         main_menu_window.UnHide()
 
@@ -192,7 +192,7 @@ while True:
             name = pack_list_values["packname"]
             pack_root = f"{root}/instances/{name}"
             if not os.path.isfile(f"{pack_root}/pack.toml"):
-                logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                print(f"The pack \"{name}\" does not exist!")
             else:
                 os.chdir(pack_root)
                 pack_toml = toml.load("pack.toml")
@@ -232,10 +232,10 @@ while True:
                         os.chdir(pack_root)
                         mod_add_command = os.system(f"{packwiz} {source} install {mod}")
                         if mod_add_command != 0:
-                            logging.error(msg=f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
+                            print(f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
                             logging.debug(msg=f"error code {mod_add_command}")
                         else:
-                            logging.info(msg=f"Successfully added mod \"{mod}\" from source \"{source}\".")
+                            print(f"Successfully added mod \"{mod}\" from source \"{source}\".")
                             if GITSET:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Added {mod}\"")
@@ -243,10 +243,10 @@ while True:
                         os.chdir(f"{pack_root}")
                         mod_remove_command = os.system(f"{packwiz} remove {mod}")
                         if mod_remove_command != 0:
-                            logging.error(msg=f"There was an error removing mod \"{mod}\"!")
+                            print(f"There was an error removing mod \"{mod}\"!")
                             logging.debug(msg=f"{mod_remove_command}")
                         else:
-                            logging.info(msg=f"Mod \"{mod}\" successfully removed.")
+                            print(f"Mod \"{mod}\" successfully removed.")
                             if GITSET:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Removed {mod}\"")
@@ -264,10 +264,10 @@ while True:
                     if pack_edit_event == "Export to CF pack":
                         pack_export_command = os.system(f"{packwiz} cf export")
                         if pack_export_command != 0:
-                            logging.error(msg=f"There was an error exporting the pack \"{name}\"!")
+                            print(f"There was an error exporting the pack \"{name}\"!")
                             logging.debug(msg=f"error code {pack_export_command}")
                         else:
-                            logging.info(msg=f"Pack \"{name}\" successfully exported.")
+                            print(f"Pack \"{name}\" successfully exported.")
                             if GITSET:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Exported pack {name}\"")
@@ -280,10 +280,10 @@ while True:
                     if pack_edit_event == "Refresh pack":
                         packwiz_refresh = os.system(f"{packwiz} refresh")
                         if packwiz_refresh != 0:
-                            logging.error(msg="There was an error refreshing the pack!")
+                            print("There was an error refreshing the pack!")
                             logging.debug(msg=f"error code {packwiz_refresh}")
                         else:
-                            logging.info(msg="Successfully refreshed pack.")
+                            print("Successfully refreshed pack.")
                     if pack_edit_event == "Update all mods":
                         command_update_all = f"{packwiz} update -a"
                         if platform.system() == "Windows":
@@ -291,9 +291,9 @@ while True:
                         else:
                             packwiz_update_all = os.system(f"bash -c \"{command_update_all}\"")
                         if packwiz_update_all != 0:
-                            logging.error(msg="There was an error updating all mods")
+                            print("There was an error updating all mods!")
                         else:
-                            logging.info(msg="Updating all mods succeeded")
+                            print("Updating all mods succeeded.")
                     if pack_edit_event == "Update mod":
                         command_update_mod = f"{packwiz} update {mod}"
                         if platform.system() == "Windows":
@@ -301,9 +301,9 @@ while True:
                         else:
                             packwiz_update_mod = os.system(f"bash -c \"{command_update_mod}\"")
                         if packwiz_update_mod != 0:
-                            logging.error(msg="There was an error updating your mod(s)")
+                            print("There was an error updating your mod(s)!")
                         else:
-                            logging.info(msg="Updating your mod(s) succeeded")
+                            print("Updating your mod(s) succeeded.")
                     if pack_edit_event == "Change":
                         pack_toml["name"] = pack_edit_values["name"]
                         pack_toml["author"] = pack_edit_values["author"]
@@ -316,16 +316,16 @@ while True:
                             os.system("git add .")
                             os.system("git commit -m \"Modify pack details\"")
                         if packwiz_refresh != 0:
-                            logging.error(msg="There was an error changing the pack details!")
+                            print("There was an error changing the pack details!")
                             logging.debug(msg=f"error code {packwiz_refresh}")
                         else:
-                            logging.info(msg="Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
+                            print("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
 
         if pack_list_event == "Delete":
             name = pack_list_values["packname"]
             pack_root = f"{root}/instances/{name}"
             if not os.path.isfile(f"{pack_root}/pack.toml"):
-                logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                print(f"The pack \"{name}\" does not exist!")
             else:
                 pack_delete = [
                               [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA.")],
@@ -341,7 +341,7 @@ while True:
                 if pack_delete_event == "Yes":
                     os.chdir(root)
                     shutil.rmtree(f"{pack_root}")
-                    logging.info(msg=f"Pack {name} deleted.")
+                    print(f"Pack {name} deleted.")
                 pack_delete_window.close()
         main_menu_window.UnHide()
 
