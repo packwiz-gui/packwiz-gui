@@ -96,12 +96,6 @@ if not os.path.isfile(packwiz):
 else:
     logging.debug(msg=f"packwiz binary is {packwiz}")
 
-PACK_CREATE_WINDOW_ACTIVE = False
-PACK_LIST_WINDOW_ACTIVE = False
-PACK_EDIT_WINDOW_ACTIVE = False
-MOD_LIST_WINDOW_ACTIVE = False
-PACK_DELETE_WINDOW_ACTIVE = False
-
 # All the stuff inside your window.
 main_menu = [
             [sg.Text("")],
@@ -116,20 +110,18 @@ main_menu = [
 
 # Create the Window
 main_menu_window = sg.Window("Main Menu", main_menu)
-MAIN_MENU_WINDOW_ACTIVE = True
 
 # Event Loop to process "events" and get the "values" of the inputs
 while True:
     main_menu_event, main_menu_values = main_menu_window.read()
-    # Main menu Close check
+    # Main menu close check
     if main_menu_event in (sg.WIN_CLOSED, "Close packwiz-gui"):
-        main_menu_window.Close()
-        MAIN_MENU_WINDOW_ACTIVE = False
+        main_menu_window.close()
         break
 
     # Main Menu
 
-    if main_menu_event == "Create a new pack" and not PACK_CREATE_WINDOW_ACTIVE:
+    if main_menu_event == "Create a new pack":
         pack_create = [
                       [sg.Text("Pack name:"), sg.InputText()],
                       [sg.Text("Author:"), sg.InputText()],
@@ -140,10 +132,8 @@ while True:
                       [sg.Button("Create"), sg.Button("Close")],
                       [sg.Text("")],
                       ]
-        main_menu_window.Hide()
-        MAIN_MENU_WINDOW_ACTIVE = False
+        main_menu_window.hide()
         pack_create_window = sg.Window("Creating a new pack", pack_create)
-        PACK_CREATE_WINDOW_ACTIVE = True
 
         # Creating a new pack
 
@@ -176,32 +166,29 @@ while True:
                     os.rmdir(pack_root)
                 else:
                     logging.info(msg=f"Pack \"{name}\" created.")
-        pack_create_window.Close()
-        PACK_CREATE_WINDOW_ACTIVE = False
+        pack_create_window.close()
         main_menu_window.UnHide()
-        MAIN_MENU_WINDOW_ACTIVE = True
 
-    if main_menu_event == "Modify a pack" and not PACK_LIST_WINDOW_ACTIVE:
+    if main_menu_event == "Modify a pack":
         instances_list = ""
         for n in os.listdir(f"{root}/instances"):
             instances_list = instances_list + n + "\n"
         pack_list = [
+                    [sg.Text("Packs:")],
                     [sg.Text(instances_list)],
                     [sg.Text("Pack Name:"), sg.InputText()],
                     [sg.Button("Open")],
                     [sg.Button("Close")],
                     [sg.Button("Delete", button_color="red")],
                     ]
-
-        main_menu_window.Hide()
-        MAIN_MENU_WINDOW_ACTIVE = False
+        main_menu_window.hide()
         pack_list_window = sg.Window("Listing existing packs", pack_list)
-        PACK_LIST_WINDOW_ACTIVE = True
 
         # Open existing packs
 
         pack_list_event, pack_list_values = pack_list_window.read()
-        if pack_list_event == "Open" and not PACK_EDIT_WINDOW_ACTIVE:
+        pack_list_window.close()
+        if pack_list_event == "Open":
             name = pack_list_values[0]
             pack_root = f"{root}/instances/{name}"
             if not os.path.isfile(f"{pack_root}/pack.toml"):
@@ -231,19 +218,15 @@ while True:
                             [sg.Button("Close")],
                             [sg.Text("")],
                             ]
-                pack_list_window.Close()
-                PACK_LIST_WINDOW_ACTIVE = False
                 pack_edit_window = sg.Window("Editing Pack", pack_edit)
-                PACK_EDIT_WINDOW_ACTIVE = True
                 # Editing Packs
                 while True:
                     pack_edit_event, pack_edit_values = pack_edit_window.read()
                     source = pack_edit_values[0]
                     mod = pack_edit_values[1]
-                    # Editing window Close check
+                    # Editing window close check
                     if pack_edit_event in (sg.WIN_CLOSED, "Close"):
-                        pack_edit_window.Close()
-                        PACK_EDIT_WINDOW_ACTIVE = False
+                        pack_edit_window.close()
                         break
                     if pack_edit_event == "Add Mod":
                         os.chdir(pack_root)
@@ -267,7 +250,7 @@ while True:
                             if GITSET:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Removed {mod}\"")
-                    if pack_edit_event == "View Installed Mods" and not MOD_LIST_WINDOW_ACTIVE:
+                    if pack_edit_event == "View Installed Mods":
                         mods_list = ""
                         for n in os.listdir(f"{pack_root}/mods"):
                             mods_list = mods_list + n + "\n"
@@ -276,10 +259,8 @@ while True:
                                    [sg.Button("Close")]
                                    ]
                         mod_list_window = sg.Window("Listing installed mods", mod_list)
-                        MOD_LIST_WINDOW_ACTIVE = True
                         mod_list_event, mod_list_values = mod_list_window.read()
-                        mod_list_window.Close()
-                        MOD_LIST_WINDOW_ACTIVE = False
+                        mod_list_window.close()
                     if pack_edit_event == "Export to CF pack":
                         pack_export_command = os.system(f"{packwiz} cf export")
                         if pack_export_command != 0:
@@ -341,7 +322,7 @@ while True:
                         else:
                             logging.info(msg="Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
 
-        if pack_list_event == "Delete" and not PACK_DELETE_WINDOW_ACTIVE:
+        if pack_list_event == "Delete":
             name = pack_list_values[0]
             pack_root = f"{root}/instances/{name}"
             if not os.path.isfile(f"{pack_root}/pack.toml"):
@@ -353,10 +334,7 @@ while True:
                               [sg.Text("")],
                               [sg.Button("Yes"), sg.Button("No")]
                               ]
-                pack_list_window.Close()
-                PACK_LIST_WINDOW_ACTIVE = False
                 pack_delete_window = sg.Window("Are you sure?", pack_delete)
-                PACK_DELETE_WINDOW_ACTIVE = True
 
                 # Deleting pack
 
@@ -365,12 +343,8 @@ while True:
                     os.chdir(root)
                     shutil.rmtree(f"{pack_root}")
                     logging.info(msg=f"Pack {name} deleted.")
-                pack_delete_window.Close()
-                PACK_DELETE_WINDOW_ACTIVE = False
-        pack_list_window.Close()
-        PACK_LIST_WINDOW_ACTIVE = False
+                pack_delete_window.close()
         main_menu_window.UnHide()
-        MAIN_MENU_WINDOW_ACTIVE = True
 
     if main_menu_event == "Download packwiz":
         if platform.system() == "Windows":
