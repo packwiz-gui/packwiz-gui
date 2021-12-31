@@ -152,8 +152,9 @@ while True:
                 os.mkdir(pack_root)
                 os.chdir(pack_root)
                 pack_create_command = os.system(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                os.system("echo *.zip >> .packwizignore")
-                os.system("echo .git/** >>.packwizignore")
+                pwignore = open(".packwizignore", "w")
+                pwignore.write("*.zip\n.git/**")
+                pwignore.close()
                 os.mkdir("mods")
                 if GITSET:
                     os.system("git init")
@@ -197,8 +198,8 @@ while True:
                 os.chdir(pack_root)
                 pack_toml = toml.load("pack.toml")
                 pack_edit = [
-                            [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"])],
-                            [sg.Text("Mod ID: "), sg.InputText()],
+                            [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"], key="source")],
+                            [sg.Text("Mod: "), sg.InputText(key="mod")],
                             [sg.Text("")],
                             [sg.Button("Add Mod")],
                             [sg.Button("Remove Mod")],
@@ -206,14 +207,14 @@ while True:
                             [sg.Button("Export to CF pack")],
                             [sg.Button("Refresh pack")],
                             [sg.Button("Update all mods")],
-                            [sg.Button("Update mod: "), sg.InputText()],
+                            [sg.Button("Update mod")],
                             [sg.Text("")],
-                            [sg.Text("Pack name:"), sg.InputText(pack_toml["name"])],
+                            [sg.Text("Pack name:"), sg.InputText(pack_toml["name"], key="name")],
                             [sg.Text("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
-                            [sg.Text("Author:"), sg.InputText(pack_toml["author"])],
-                            [sg.Text("Pack Version:"), sg.InputText(pack_toml["version"])],
-                            [sg.Text("Minecraft Version:"), sg.InputText(pack_toml["versions"]["minecraft"])],
-                            [sg.Text("Changing modloader is currently unsupported")],
+                            [sg.Text("Author:"), sg.InputText(pack_toml["author"], key="author")],
+                            [sg.Text("Pack Version:"), sg.InputText(pack_toml["version"], key="version")],
+                            [sg.Text("Minecraft Version:"), sg.InputText(pack_toml["versions"]["minecraft"], key="minecraftversion")],
+                            [sg.Text("Changing modloader is currently unsupported.")],
                             [sg.Button("Change")],
                             [sg.Button("Close")],
                             [sg.Text("")],
@@ -222,8 +223,8 @@ while True:
                 # Editing Packs
                 while True:
                     pack_edit_event, pack_edit_values = pack_edit_window.read()
-                    source = pack_edit_values[0]
-                    mod = pack_edit_values[1]
+                    source = pack_edit_values["source"]
+                    mod = pack_edit_values["mod"]
                     # Editing window close check
                     if pack_edit_event in (sg.WIN_CLOSED, "Close"):
                         pack_edit_window.close()
@@ -294,8 +295,8 @@ while True:
                             logging.error(msg="There was an error updating all mods")
                         else:
                             logging.info(msg="Updating all mods succeeded")
-                    if pack_edit_event == "Update mod: ":
-                        command_update_mod = f"{packwiz} update {pack_edit_values[1]}"
+                    if pack_edit_event == "Update mod":
+                        command_update_mod = f"{packwiz} update {mod}"
                         if platform.system() == "Windows":
                             packwiz_update_mod = os.system(f"cmd /c \"{command_update_mod}\"")
                         else:
@@ -305,13 +306,13 @@ while True:
                         else:
                             logging.info(msg="Updating your mod(s) succeeded")
                     if pack_edit_event == "Change":
-                        pack_toml["name"] = pack_edit_values[2]
-                        pack_toml["author"] = pack_edit_values[3]
-                        pack_toml["version"] = pack_edit_values[4]
-                        pack_toml["versions"]["minecraft"] = pack_edit_values[5]
-                        pack_toml_handler = open("pack.toml", "w+")
-                        toml.dump(pack_toml, pack_toml_handler)
-                        pack_toml_handler.close()
+                        pack_toml["name"] = pack_edit_values["name"]
+                        pack_toml["author"] = pack_edit_values["author"]
+                        pack_toml["version"] = pack_edit_values["version"]
+                        pack_toml["versions"]["minecraft"] = pack_edit_values["minecraftversion"]
+                        pack_toml_file = open("pack.toml", "w")
+                        toml.dump(pack_toml, pack_toml_file)
+                        pack_toml_file.close()
                         packwiz_refresh = os.system(f"{packwiz} refresh")
                         if GITSET:
                             os.system("git add .")
