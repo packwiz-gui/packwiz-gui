@@ -226,9 +226,9 @@ while True:
             if pack_list_event == "Open" and not PACK_EDIT_WINDOW_ACTIVE:
                 name = pack_list_values[0]
                 pack_root = f"{root}/instances/{name}"
-                if not os.path.isdir(pack_root):
-                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
-                else:
+                #if not os.path.isdir(pack_root):
+                    #logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                #else:
                     if not os.path.isfile(f"{pack_root}/pack.toml"):
                         logging.warning(msg=f"The pack \"{name}\" does not exist!")
                     else:
