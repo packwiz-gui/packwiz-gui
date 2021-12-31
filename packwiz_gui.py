@@ -229,156 +229,144 @@ while True:
                 #if not os.path.isdir(pack_root):
                     #logging.warning(msg=f"The pack \"{name}\" does not exist!")
                 #else:
-                    if not os.path.isfile(f"{pack_root}/pack.toml"):
-                        logging.warning(msg=f"The pack \"{name}\" does not exist!")
-                    else:
-                        os.chdir(pack_root)
-                        pack_toml = toml.load("pack.toml")
-                        pack_edit = [
-                                    [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"])],
-                                    [sg.Text("Mod ID: "), sg.InputText()],
-                                    [sg.Text("")],
-                                    [sg.Button("Add Mod")],
-                                    [sg.Button("Remove Mod")],
-                                    [sg.Button("View Installed Mods")],
-                                    [sg.Button("Export to CF pack")],
-                                    [sg.Button("Refresh pack")],
-                                    [sg.Button("Update all mods")],
-                                    [sg.Button("Update mod: "), sg.InputText()],
-                                    [sg.Text("")],
-                                    [sg.Text("Pack name:"), sg.InputText(pack_toml["name"])],
-                                    [sg.Text("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
-                                    [sg.Text("Author:"), sg.InputText(pack_toml["author"])],
-                                    [sg.Text("Pack Version:"), sg.InputText(pack_toml["version"])],
-                                    [sg.Text("Minecraft Version:"), sg.InputText(pack_toml["versions"]["minecraft"])],
-                                    [sg.Text("Changing modloader is currently unsupported")],
-                                    [sg.Button("Change")],
-                                    [sg.Button("Close")],
-                                    [sg.Text("")],
-                                    ]
-                        pack_list_window.Close()
-                        PACK_LIST_WINDOW_ACTIVE = False
-                        pack_edit_window = sg.Window("Editing Pack", pack_edit)
-                        PACK_EDIT_WINDOW_ACTIVE = True
-
-                        # Editing Packs
-
-                        while True:
-                            pack_edit_event, pack_edit_values = pack_edit_window.read()
-                            source = pack_edit_values[0]
-                            mod = pack_edit_values[1]
-                            # Editing window Close check
-                            if pack_edit_event in (sg.WIN_CLOSED, "Close"):
-                                pack_edit_window.Close()
-                                PACK_EDIT_WINDOW_ACTIVE = False
-                                main_menu_window.UnHide()
-                                MAIN_MENU_WINDOW_ACTIVE = True
-                                break
-
-                            if pack_edit_event == "Add Mod":
-                                os.chdir(pack_root)
-                                mod_add_command = os.system(f"{packwiz} {source} install {mod}")
-                                if mod_add_command != 0:
-                                    logging.error(msg=f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
-                                    logging.debug(msg=f"error code {mod_add_command}")
-                                else:
-                                    logging.info(msg=f"Successfully added mod \"{mod}\" from source \"{source}\".")
-                                    if GITSET:
-                                        os.system("git add .")
-                                        os.system(f"git commit -m \"Added {mod}\"")
-
-                            if pack_edit_event == "Remove Mod":
-                                os.chdir(f"{pack_root}")
-                                mod_remove_command = os.system(f"{packwiz} remove {mod}")
-                                if mod_remove_command != 0:
-                                    logging.error(msg=f"There was an error removing mod \"{mod}\"!")
-                                    logging.debug(msg=f"{mod_remove_command}")
-                                else:
-                                    logging.info(msg=f"Mod \"{mod}\" successfully removed.")
-                                    if GITSET:
-                                        os.system("git add .")
-                                        os.system(f"git commit -m \"Removed {mod}\"")
-
-                            if pack_edit_event == "View Installed Mods" and not MOD_LIST_WINDOW_ACTIVE:
-                                mods_list = ""
-                                for n in os.listdir(f"{pack_root}/mods"):
-                                    mods_list = mods_list + n + "\n"
-                                mod_list = [
-                                           [sg.Text(mods_list)],
-                                           [sg.Button("Close")]
-                                           ]
-
-                                mod_list_window = sg.Window("Listing installed mods", mod_list)
-                                MOD_LIST_WINDOW_ACTIVE = True
-                                mod_list_event, mod_list_values = mod_list_window.read()
-                                mod_list_window.Close()
-                                MOD_LIST_WINDOW_ACTIVE = False
-
-                            if pack_edit_event == "Export to CF pack":
-                                pack_export_command = os.system(f"{packwiz} cf export")
-                                if pack_export_command != 0:
-                                    logging.error(msg=f"There was an error exporting the pack \"{name}\"!")
-                                    logging.debug(msg=f"error code {pack_export_command}")
-                                else:
-                                    logging.info(msg=f"Pack \"{name}\" successfully exported.")
-                                    if GITSET:
-                                        os.system("git add .")
-                                        os.system(f"git commit -m \"Exported pack {name}\"")
-                                    if platform.system() == "Windows":
-                                        os.startfile(pack_root)
-                                    elif platform.system() == "Darwin":
-                                        os.system(f"open {pack_root}")
-                                    else:
-                                        os.system(f"xdg-open {pack_root}")
-
-                            if pack_edit_event == "Refresh pack":
-                                packwiz_refresh = os.system(f"{packwiz} refresh")
-                                if packwiz_refresh != 0:
-                                    logging.error(msg="There was an error refreshing the pack!")
-                                    logging.debug(msg=f"error code {packwiz_refresh}")
-                                else:
-                                    logging.info(msg="Successfully refreshed pack.")
-
-                            if pack_edit_event == "Update all mods":
-
-                                command_update_all = f"{packwiz} update -a"
-                                if platform.system() == "Windows":
-                                    packwiz_update_all = os.system(f"cmd /c \"{command_update_all}\"")
-                                else:
-                                    packwiz_update_all = os.system(f"bash -c \"{command_update_all}\"")
-                                if packwiz_update_all != 0:
-                                    logging.error(msg="There was an error updating all mods")
-                                else:
-                                    logging.info(msg="Updating all mods succeeded")
-
-                            if pack_edit_event == "Update mod: ":
-                                command_update_mod = f"{packwiz} update {pack_edit_values[1]}"
-                                if platform.system() == "Windows":
-                                    packwiz_update_mod = os.system(f"cmd /c \"{command_update_mod}\"")
-                                else:
-                                    packwiz_update_mod = os.system(f"bash -c \"{command_update_mod}\"")
-                                if packwiz_update_mod != 0:
-                                    logging.error(msg="There was an error updating your mod(s)")
-                                else:
-                                    logging.info(msg="Updating your mod(s) succeeded")
-
-                            if pack_edit_event == "Change":
-                                pack_toml["name"] = pack_edit_values[2]
-                                pack_toml["author"] = pack_edit_values[3]
-                                pack_toml["version"] = pack_edit_values[4]
-                                pack_toml["versions"]["minecraft"] = pack_edit_values[5]
-                                pack_toml_handler = open("pack.toml", "w+")
-                                toml.dump(pack_toml, pack_toml_handler)
-                                pack_toml_handler.close()
-                                packwiz_refresh = os.system(f"{packwiz} refresh")
+                if not os.path.isfile(f"{pack_root}/pack.toml"):
+                    logging.warning(msg=f"The pack \"{name}\" does not exist!")
+                else:
+                    os.chdir(pack_root)
+                    pack_toml = toml.load("pack.toml")
+                    pack_edit = [
+                                [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"])],
+                                [sg.Text("Mod ID: "), sg.InputText()],
+                                [sg.Text("")],
+                                [sg.Button("Add Mod")],
+                                [sg.Button("Remove Mod")],
+                                [sg.Button("View Installed Mods")],
+                                [sg.Button("Export to CF pack")],
+                                [sg.Button("Refresh pack")],
+                                [sg.Button("Update all mods")],
+                                [sg.Button("Update mod: "), sg.InputText()],
+                                [sg.Text("")],
+                                [sg.Text("Pack name:"), sg.InputText(pack_toml["name"])],
+                                [sg.Text("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
+                                [sg.Text("Author:"), sg.InputText(pack_toml["author"])],
+                                [sg.Text("Pack Version:"), sg.InputText(pack_toml["version"])],
+                                [sg.Text("Minecraft Version:"), sg.InputText(pack_toml["versions"]["minecraft"])],
+                                [sg.Text("Changing modloader is currently unsupported")],
+                                [sg.Button("Change")],
+                                [sg.Button("Close")],
+                                [sg.Text("")],
+                                ]
+                    pack_list_window.Close()
+                    PACK_LIST_WINDOW_ACTIVE = False
+                    pack_edit_window = sg.Window("Editing Pack", pack_edit)
+                    PACK_EDIT_WINDOW_ACTIVE = True
+                    # Editing Packs
+                    while True:
+                        pack_edit_event, pack_edit_values = pack_edit_window.read()
+                        source = pack_edit_values[0]
+                        mod = pack_edit_values[1]
+                        # Editing window Close check
+                        if pack_edit_event in (sg.WIN_CLOSED, "Close"):
+                            pack_edit_window.Close()
+                            PACK_EDIT_WINDOW_ACTIVE = False
+                            main_menu_window.UnHide()
+                            MAIN_MENU_WINDOW_ACTIVE = True
+                            break
+                        if pack_edit_event == "Add Mod":
+                            os.chdir(pack_root)
+                            mod_add_command = os.system(f"{packwiz} {source} install {mod}")
+                            if mod_add_command != 0:
+                                logging.error(msg=f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
+                                logging.debug(msg=f"error code {mod_add_command}")
+                            else:
+                                logging.info(msg=f"Successfully added mod \"{mod}\" from source \"{source}\".")
                                 if GITSET:
                                     os.system("git add .")
-                                    os.system(f"git commit -m \"Modify pack details\"")
-                                if packwiz_refresh != 0:
-                                    logging.error(msg="There was an error changing the pack details!")
-                                    logging.debug(msg=f"error code {packwiz_refresh}")
+                                    os.system(f"git commit -m \"Added {mod}\"")
+                        if pack_edit_event == "Remove Mod":
+                            os.chdir(f"{pack_root}")
+                            mod_remove_command = os.system(f"{packwiz} remove {mod}")
+                            if mod_remove_command != 0:
+                                logging.error(msg=f"There was an error removing mod \"{mod}\"!")
+                                logging.debug(msg=f"{mod_remove_command}")
+                            else:
+                                logging.info(msg=f"Mod \"{mod}\" successfully removed.")
+                                if GITSET:
+                                    os.system("git add .")
+                                    os.system(f"git commit -m \"Removed {mod}\"")
+                        if pack_edit_event == "View Installed Mods" and not MOD_LIST_WINDOW_ACTIVE:
+                            mods_list = ""
+                            for n in os.listdir(f"{pack_root}/mods"):
+                                mods_list = mods_list + n + "\n"
+                            mod_list = [
+                                       [sg.Text(mods_list)],
+                                       [sg.Button("Close")]
+                                       ]
+                            mod_list_window = sg.Window("Listing installed mods", mod_list)
+                            MOD_LIST_WINDOW_ACTIVE = True
+                            mod_list_event, mod_list_values = mod_list_window.read()
+                            mod_list_window.Close()
+                            MOD_LIST_WINDOW_ACTIVE = False
+                        if pack_edit_event == "Export to CF pack":
+                            pack_export_command = os.system(f"{packwiz} cf export")
+                            if pack_export_command != 0:
+                                logging.error(msg=f"There was an error exporting the pack \"{name}\"!")
+                                logging.debug(msg=f"error code {pack_export_command}")
+                            else:
+                                logging.info(msg=f"Pack \"{name}\" successfully exported.")
+                                if GITSET:
+                                    os.system("git add .")
+                                    os.system(f"git commit -m \"Exported pack {name}\"")
+                                if platform.system() == "Windows":
+                                    os.startfile(pack_root)
+                                elif platform.system() == "Darwin":
+                                    os.system(f"open {pack_root}")
                                 else:
-                                    logging.info(msg="Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
+                                    os.system(f"xdg-open {pack_root}")
+                        if pack_edit_event == "Refresh pack":
+                            packwiz_refresh = os.system(f"{packwiz} refresh")
+                            if packwiz_refresh != 0:
+                                logging.error(msg="There was an error refreshing the pack!")
+                                logging.debug(msg=f"error code {packwiz_refresh}")
+                            else:
+                                logging.info(msg="Successfully refreshed pack.")
+                        if pack_edit_event == "Update all mods":
+                            command_update_all = f"{packwiz} update -a"
+                            if platform.system() == "Windows":
+                                packwiz_update_all = os.system(f"cmd /c \"{command_update_all}\"")
+                            else:
+                                packwiz_update_all = os.system(f"bash -c \"{command_update_all}\"")
+                            if packwiz_update_all != 0:
+                                logging.error(msg="There was an error updating all mods")
+                            else:
+                                logging.info(msg="Updating all mods succeeded")
+                        if pack_edit_event == "Update mod: ":
+                            command_update_mod = f"{packwiz} update {pack_edit_values[1]}"
+                            if platform.system() == "Windows":
+                                packwiz_update_mod = os.system(f"cmd /c \"{command_update_mod}\"")
+                            else:
+                                packwiz_update_mod = os.system(f"bash -c \"{command_update_mod}\"")
+                            if packwiz_update_mod != 0:
+                                logging.error(msg="There was an error updating your mod(s)")
+                            else:
+                                logging.info(msg="Updating your mod(s) succeeded")
+                        if pack_edit_event == "Change":
+                            pack_toml["name"] = pack_edit_values[2]
+                            pack_toml["author"] = pack_edit_values[3]
+                            pack_toml["version"] = pack_edit_values[4]
+                            pack_toml["versions"]["minecraft"] = pack_edit_values[5]
+                            pack_toml_handler = open("pack.toml", "w+")
+                            toml.dump(pack_toml, pack_toml_handler)
+                            pack_toml_handler.close()
+                            packwiz_refresh = os.system(f"{packwiz} refresh")
+                            if GITSET:
+                                os.system("git add .")
+                                os.system(f"git commit -m \"Modify pack details\"")
+                            if packwiz_refresh != 0:
+                                logging.error(msg="There was an error changing the pack details!")
+                                logging.debug(msg=f"error code {packwiz_refresh}")
+                            else:
+                                logging.info(msg="Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
 
             if pack_list_event == "Delete" and not PACK_DELETE_WINDOW_ACTIVE:
                 name = pack_list_values[0]
