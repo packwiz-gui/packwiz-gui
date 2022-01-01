@@ -10,7 +10,7 @@ in the `bin` folder (created when you start packwiz-gui).
 4. Run the `packwiz_gui.py` file using the command `python` on Windows or `python3` on Unix-based OSes.
 ***Note: run it from the command line, do NOT double click it***
 5. Enjoy!
-   
+
 ## Command line flags
 
 Flags are listed if you use `packwiz_gui.py --help`.
@@ -24,3 +24,5 @@ To turn packwiz-gui into an executable, use `cx_freeze` or `pyinstaller`. The gi
 Yep, this has a discord server.
 
 https://discord.gg/zbjAfy8DjX
+
+<!-- Spank me daddy exo -->
