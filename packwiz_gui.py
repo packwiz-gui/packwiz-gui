@@ -40,15 +40,11 @@ def main():
             gitset = True
 
     if qtset:
-        if platform.system() == "Windows":
-            print("Error: Cannot use Qt on Windows")
+        try:
+            import PySimpleGUIQt as sg
+        except ModuleNotFoundError:
+            print("You must install PySimpleGUIQt!")
             sys.exit()
-        else:
-            try:
-                import PySimpleGUIQt as sg
-            except ModuleNotFoundError:
-                print("You must install PySimpleGUIQt!")
-                sys.exit()
     else:
         try:
             import PySimpleGUI as sg
