@@ -73,31 +73,23 @@ def main():
     def log(msg, logtype):
         if logtype == "debug":
             logging.debug(msg=msg)
-            return True
         elif logtype == "info":
             logging.info(msg=msg)
-            return True
         elif logtype == "warning":
             logging.warning(msg=msg)
-            return True
         elif logtype == "warningsg":
             logging.warning(msg=msg)
             sg.popup_ok_cancel(msg)
-            return True
         elif logtype == "error":
             logging.error(msg=msg)
-            return True
         elif logtype == "errorsg":
             logging.error(msg=msg)
             sg.popup_error(msg)
-            return True
         elif logtype == "critical":
             logging.critical(msg=msg)
-            return True
         elif logtype == "criticalsg":
             logging.critical(msg=msg)
             sg.popup_error(msg)
-            return True
         else:
             raise ValueError("Wrong or no type provided!")
 
@@ -276,7 +268,7 @@ def main():
                         if pack_edit_event == "View Installed Mods":
                             mods_list = ""
                             for mod in os.listdir(f"{pack_root}/mods"):
-                                mods_list = mods_list + mod.replace(".toml", "", 1) + "\n"
+                                mods_list = mods_list + mod[::-1].replace("lmot.", "", 1)[::-1] + "\n"
                             sg.popup(mods_list, title="Installed mods")
                         if pack_edit_event == "Export to CF pack":
                             pack_export_command = os.system(f"{packwiz} cf export")
