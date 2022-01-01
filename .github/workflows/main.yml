@@ -1,0 +1,81 @@
+name: build
+on: [push, pull_request]
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: python3 -m pip install cx_freeze PyInstaller PySimpleGUI PySimpleGUIQt
+      - name: Compile pyinstaller
+        run: python3 build.py --pyinstaller
+      - name: Upload pyinstaller
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui_linux_pyinstaller
+          path: pyinstaller/dist
+      - name: Cleanup
+        run: python3 build.py -r
+      - name: Compile cxfreeze
+        run: python3 build.py --cxfreeze
+      - name: Upload cxfreeze
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui_linux_cxfreeze
+          path: cxfreeze/build
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: python3 -m pip install cx_freeze PyInstaller PySimpleGUI PySimpleGUIQt
+      - name: Compile pyinstaller
+        run: python3 build.py --pyinstaller
+      - name: Upload pyinstaller
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui_windows_pyinstaller
+          path: pyinstaller/dist
+      - name: Cleanup
+        run: python3 build.py -r
+      - name: Compile cxfreeze
+        run: python3 build.py --cxfreeze
+      - name: Upload cxfreeze
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui_windows_cxfreeze
+          path: cxfreeze/build
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: python3 -m pip install cx_freeze PyInstaller PySimpleGUI PySimpleGUIQt
+      - name: Compile pyinstaller
+        run: python3 build.py --pyinstaller
+      - name: Upload pyinstaller
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui_macos_pyinstaller
+          path: pyinstaller/dist
+      - name: Cleanup
+        run: python3 build.py -r
+      - name: Compile cxfreeze
+        run: python3 build.py --cxfreeze
+      - name: Upload cxfreeze
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: packwiz_gui_macos_cxfreeze
+          path: cxfreeze/build
