@@ -11,40 +11,35 @@ import toml
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:qhvgb", ["theme=", "qt", "help", "verbose", "debug", "git", "bin"])
+        opts, args = getopt.getopt(sys.argv[1:], "t:qhdg", ["theme=", "qt", "help", "debug", "git"])
     except getopt.GetoptError:
         print("Error: Unknown flag.\nUse --help to see available commands.")
         sys.exit()
 
-    THEMESET = ""
-    QTSET = False
-    LOGLEVEL = 15
-    GITSET = False
-    BINARY = False
+    theme = None
+    qtset = False
+    loglevel = 15
+    gitset = False
 
     for opt, arg in opts:
-        if opt in ("--theme", "-t"):
-            THEMESET = arg
-        if opt in ("-q", "--qt"):
-            QTSET = True
-        if opt in ("-h", "--help"):
+        if opt in ("-t", "--theme"):
+            theme = arg
+        elif opt in ("-q", "--qt"):
+            qtset = True
+        elif opt in ("-h", "--help"):
             print("")
             print("  -t, --theme, <theme>:              - Pick a custom theme.")
             print("  -q, --qt:                          - Use Qt instead of tkinter. Requires PySimpleGUIQt.")
             print("  -h, --help:                        - This help message.")
-            print("  -v, --verbose, --debug:            - More verbose logging.")
-            print("  -b, --bin:                         - Run in binary mode. If you run this script without this flag as a binary, it will crash.")
-            print("                                       This may cause unknown bugs.")
+            print("  -d  --debug:                       - More verbose logging.")
             print("")
             sys.exit()
-        if opt in ("-v", "--verbose", "--debug"):
-            LOGLEVEL = 10
-        if opt in ("-g", "--git"):
-            GITSET = True
-        if opt in ("-b", "--bin"):
-            BINARY = True
+        elif opt in ("-d", "--debug"):
+            loglevel = 10
+        elif opt in ("-g", "--git"):
+            gitset = True
 
-    if QTSET:
+    if qtset:
         if platform.system() == "Windows":
             print("Error: Cannot use Qt on Windows")
             sys.exit()
@@ -60,15 +55,15 @@ def main():
         except ModuleNotFoundError:
             print("You must install PySimpleGUI!")
             sys.exit()
-    if THEMESET == "":
-        if QTSET:
+    if theme is None:
+        if qtset:
             sg.theme("SystemDefaultForReal")
         else:
             sg.theme("DarkGrey9")
     else:
-        sg.theme(THEMESET)
+        sg.theme(theme)
 
-    if not BINARY:
+    if os.path.isdir(sys.path[0]):
         root = sys.path[0]
     else:
         root = os.getcwd()
@@ -76,10 +71,40 @@ def main():
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
     logging_handlers = [logging_file_handler, logging_stdout_handler]
-    logging.basicConfig(handlers=logging_handlers, level=LOGLEVEL)
+    logging.basicConfig(handlers=logging_handlers, level=loglevel)
 
-    logging.debug(msg=f"root dir is {root}")
+    def log(msg, logtype):
+        if logtype == "debug":
+            logging.debug(msg=msg)
+            return True
+        elif logtype == "info":
+            logging.info(msg=msg)
+            return True
+        elif logtype == "warning":
+            logging.warning(msg=msg)
+            return True
+        elif logtype == "warningsg":
+            logging.warning(msg=msg)
+            sg.popup_ok_cancel(msg)
+            return True
+        elif logtype == "error":
+            logging.error(msg=msg)
+            return True
+        elif logtype == "errorsg":
+            logging.error(msg=msg)
+            sg.popup_error(msg)
+            return True
+        elif logtype == "critical":
+            logging.critical(msg=msg)
+            return True
+        elif logtype == "criticalsg":
+            logging.critical(msg=msg)
+            sg.popup_error(msg)
+            return True
+        else:
+            raise ValueError("Wrong or no type provided!")
 
+    log(f"root dir is {root}", "debug")
     if platform.system() == "Windows":
         packwiz = f"{root}\\bin\\packwiz.exe"
     else:
@@ -88,14 +113,14 @@ def main():
 
     if not os.path.isdir(f"{root}/instances"):
         os.mkdir(f"{root}/instances")
-        logging.warning(msg="No instances folder, creating...")
+        log("No instances folder, creating...", "warning")
     if not os.path.isdir(f"{root}/bin"):
         os.mkdir(f"{root}/bin")
-        logging.warning(msg="No bin folder, creating...")
+        log( "No bin folder, creating...", "warning")
     if not os.path.isfile(packwiz):
-        logging.critical(msg="Packwiz does not exist! Please download packwiz and put it in the bin folder!")
+        log("Packwiz does not exist! Please download packwiz and put it in the bin folder!", "criticalsg")
     else:
-        logging.debug(msg=f"packwiz binary is {packwiz}")
+        log(f"packwiz binary is {packwiz}", "debug")
 
     # All the stuff inside your window.
     main_menu = [
@@ -156,14 +181,14 @@ def main():
                     with open(".packwizignore", "w", encoding="utf8") as pwignore:
                         pwignore.write("*.zip\n.git/**")
                     os.mkdir("mods")
-                    if GITSET:
+                    if gitset:
                         os.system("git init")
                         os.system("git add .")
                         os.system(f"git commit -m \"Create pack {name}\"")
                     os.chdir(root)
                     if pack_create_command != 0:
                         print(f"There was an error creating the pack \"{name}\"!")
-                        logging.debug(msg=f"error code {pack_create_command}")
+                        log(f"error code {pack_create_command}", "debug")
                         shutil.rmtree(pack_root)
                     else:
                         print(f"Pack \"{name}\" created.")
@@ -171,12 +196,12 @@ def main():
             main_menu_window.UnHide()
 
         if main_menu_event == "Modify a pack":
-            INSTANCES_LIST = ""
-            for n in os.listdir(f"{root}/instances"):
-                INSTANCES_LIST = INSTANCES_LIST + n + "\n"
+            instances_list = ""
+            for instance in os.listdir(f"{root}/instances"):
+                instances_list = instances_list + instance + "\n"
             pack_list = [
                         [sg.Text("Packs:")],
-                        [sg.Text(INSTANCES_LIST)],
+                        [sg.Text(instances_list)],
                         [sg.Text("Pack Name:"), sg.InputText(key="packname")],
                         [sg.Button("Open")],
                         [sg.Button("Close")],
@@ -234,10 +259,10 @@ def main():
                             mod_add_command = os.system(f"{packwiz} {source} install {mod}")
                             if mod_add_command != 0:
                                 print(f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
-                                logging.debug(msg=f"error code {mod_add_command}")
+                                log(f"error code {mod_add_command}", "debug")
                             else:
                                 print(f"Successfully added mod \"{mod}\" from source \"{source}\".")
-                                if GITSET:
+                                if gitset:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Added {mod}\"")
                         if pack_edit_event == "Remove Mod":
@@ -245,31 +270,25 @@ def main():
                             mod_remove_command = os.system(f"{packwiz} remove {mod}")
                             if mod_remove_command != 0:
                                 print(f"There was an error removing mod \"{mod}\"!")
-                                logging.debug(msg=f"{mod_remove_command}")
+                                log(f"error code {mod_remove_command}", "debug")
                             else:
                                 print(f"Mod \"{mod}\" successfully removed.")
-                                if GITSET:
+                                if gitset:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Removed {mod}\"")
                         if pack_edit_event == "View Installed Mods":
-                            MODS_LIST = ""
-                            for n in os.listdir(f"{pack_root}/mods"):
-                                MODS_LIST = MODS_LIST + n + "\n"
-                            mod_list = [
-                                    [sg.Text(MODS_LIST)],
-                                    [sg.Button("Close")]
-                                    ]
-                            mod_list_window = sg.Window("Listing installed mods", mod_list)
-                            mod_list_event, mod_list_values = mod_list_window.read()
-                            mod_list_window.close()
+                            mods_list = ""
+                            for mod in os.listdir(f"{pack_root}/mods"):
+                                mods_list = mods_list + mod.replace(".toml", "", 1) + "\n"
+                            sg.popup(mods_list, title="Installed mods")
                         if pack_edit_event == "Export to CF pack":
                             pack_export_command = os.system(f"{packwiz} cf export")
                             if pack_export_command != 0:
                                 print(f"There was an error exporting the pack \"{name}\"!")
-                                logging.debug(msg=f"error code {pack_export_command}")
+                                log(f"error code {pack_export_command}", "debug")
                             else:
                                 print(f"Pack \"{name}\" successfully exported.")
-                                if GITSET:
+                                if gitset:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Exported pack {name}\"")
                                 if platform.system() == "Windows":
@@ -282,7 +301,7 @@ def main():
                             packwiz_refresh = os.system(f"{packwiz} refresh")
                             if packwiz_refresh != 0:
                                 print("There was an error refreshing the pack!")
-                                logging.debug(msg=f"error code {packwiz_refresh}")
+                                log(f"error code {packwiz_refresh}", "debug")
                             else:
                                 print("Successfully refreshed pack.")
                         if pack_edit_event == "Update all mods":
@@ -313,12 +332,12 @@ def main():
                             with open("pack.toml", "w", encoding="utf8") as pack_toml_file:
                                 toml.dump(pack_toml, pack_toml_file)
                             packwiz_refresh = os.system(f"{packwiz} refresh")
-                            if GITSET:
+                            if gitset:
                                 os.system("git add .")
                                 os.system("git commit -m \"Modify pack details\"")
                             if packwiz_refresh != 0:
                                 print("There was an error changing the pack details!")
-                                logging.debug(msg=f"error code {packwiz_refresh}")
+                                log(f"error code {packwiz_refresh}", "debug")
                             else:
                                 print("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
 
@@ -328,22 +347,12 @@ def main():
                 if not os.path.isfile(f"{pack_root}/pack.toml"):
                     print(f"The pack \"{name}\" does not exist!")
                 else:
-                    pack_delete = [
-                                [sg.Text("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA.")],
-                                [sg.Text("ONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?")],
-                                [sg.Text("")],
-                                [sg.Button("Yes"), sg.Button("No")]
-                                ]
-                    pack_delete_window = sg.Window("Are you sure?", pack_delete)
-
-                    # Deleting pack
-
-                    pack_delete_event, pack_delete_values = pack_delete_window.read()
+                    pack_delete_event = sg.popup_yes_no("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA."
+                                                        "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?", title="Are you sure?")
                     if pack_delete_event == "Yes":
                         os.chdir(root)
                         shutil.rmtree(f"{pack_root}")
                         print(f"Pack {name} deleted.")
-                    pack_delete_window.close()
             main_menu_window.UnHide()
 
         if main_menu_event == "Download packwiz":
