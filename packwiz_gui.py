@@ -28,10 +28,11 @@ def main():
             qtset = True
         elif opt in ("-h", "--help"):
             print("")
-            print("  -t, --theme, <theme>:              - Pick a custom theme.")
-            print("  -q, --qt:                          - Use Qt instead of tkinter. Requires PySimpleGUIQt.")
+            print("  -t, --theme, <theme>:              - Picks a custom theme.")
+            print("  -q, --qt:                          - Qt instead of tkinter. Requires PySimpleGUIQt.")
             print("  -h, --help:                        - This help message.")
-            print("  -d  --debug:                       - More verbose logging.")
+            print("  -d, --debug:                       - Verbose logging.")
+            print("  -g, --git:                         - Git support.")
             print("")
             sys.exit()
         elif opt in ("-d", "--debug"):
