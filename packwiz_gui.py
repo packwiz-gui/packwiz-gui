@@ -305,11 +305,7 @@ def main():
                                 os.system("git add .")
                                 os.system("git commit -m \"Refresh pack\"")
                         if pack_edit_event == "Update all mods":
-                            command_update_all = f"{packwiz} update -a"
-                            if platform.system() == "Windows":
-                                packwiz_update_all = os.system(f"cmd /c \"{command_update_all}\"")
-                            else:
-                                packwiz_update_all = os.system(f"bash -c \"{command_update_all}\"")
+                            packwiz_update_all = os.system(f"{packwiz} update -a")
                             if packwiz_update_all != 0:
                                 print("There was an error updating all mods!")
                             else:
@@ -318,11 +314,7 @@ def main():
                                 os.system("git add .")
                                 os.system("git commit -m \"Update all mods\"")
                         if pack_edit_event == "Update mod":
-                            command_update_mod = f"{packwiz} update {mod}"
-                            if platform.system() == "Windows":
-                                packwiz_update_mod = os.system(f"cmd /c \"{command_update_mod}\"")
-                            else:
-                                packwiz_update_mod = os.system(f"bash -c \"{command_update_mod}\"")
+                            packwiz_update_mod = os.system(f"{packwiz} update {mod}")
                             if packwiz_update_mod != 0:
                                 print("There was an error updating your mod(s)!")
                             else:
