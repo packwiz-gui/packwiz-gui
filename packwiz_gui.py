@@ -261,7 +261,7 @@ def main():
                                 print(f"Successfully added mod \"{mod}\" from source \"{source}\".")
                                 if gitset:
                                     os.system("git add .")
-                                    os.system(f"git commit -m \"Added {mod}\"")
+                                    os.system(f"git commit -m \"Add {mod}\"")
                         if pack_edit_event == "Remove Mod":
                             os.chdir(f"{pack_root}")
                             mod_remove_command = os.system(f"{packwiz} remove {mod}")
@@ -272,7 +272,7 @@ def main():
                                 print(f"Mod \"{mod}\" successfully removed.")
                                 if gitset:
                                     os.system("git add .")
-                                    os.system(f"git commit -m \"Removed {mod}\"")
+                                    os.system(f"git commit -m \"Remove {mod}\"")
                         if pack_edit_event == "View Installed Mods":
                             mods_list = ""
                             for mod in os.listdir(f"{pack_root}/mods"):
@@ -287,7 +287,7 @@ def main():
                                 print(f"Pack \"{name}\" successfully exported.")
                                 if gitset:
                                     os.system("git add .")
-                                    os.system(f"git commit -m \"Exported pack {name}\"")
+                                    os.system(f"git commit -m \"Export pack {name}\"")
                                 if platform.system() == "Windows":
                                     os.startfile(pack_root)
                                 elif platform.system() == "Darwin":
@@ -301,6 +301,9 @@ def main():
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
                                 print("Successfully refreshed pack.")
+                            if gitset:
+                                os.system("git add .")
+                                os.system("git commit -m \"Refresh pack\"")
                         if pack_edit_event == "Update all mods":
                             command_update_all = f"{packwiz} update -a"
                             if platform.system() == "Windows":
@@ -311,6 +314,9 @@ def main():
                                 print("There was an error updating all mods!")
                             else:
                                 print("Updating all mods succeeded.")
+                            if gitset:
+                                os.system("git add .")
+                                os.system("git commit -m \"Update all mods\"")
                         if pack_edit_event == "Update mod":
                             command_update_mod = f"{packwiz} update {mod}"
                             if platform.system() == "Windows":
@@ -321,6 +327,9 @@ def main():
                                 print("There was an error updating your mod(s)!")
                             else:
                                 print("Updating your mod(s) succeeded.")
+                            if gitset:
+                                os.system("git add .")
+                                os.system(f"git commit -m \"Update {mod}\"")
                         if pack_edit_event == "Change":
                             pack_toml["name"] = pack_edit_values["name"]
                             pack_toml["author"] = pack_edit_values["author"]
