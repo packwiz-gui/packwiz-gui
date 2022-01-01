@@ -18,3 +18,9 @@ Flags are listed if you use `packwiz_gui.py --help`.
 ## Building into executable
 
 To turn packwiz-gui into an executable, use `cx_freeze` or `pyinstaller`. The github actions builds may or may not work.
+
+## Discord server
+
+Yep, this has a discord server.
+
+https://discord.gg/zbjAfy8DjX
