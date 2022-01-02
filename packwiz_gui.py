@@ -99,20 +99,20 @@ def main():
     settings = opentoml(f"{root}/settings.toml")
     valid_backends = ["tk", "qt"]
     if settings["backend"] in valid_backends:
-        if settings["backend"] == "tk":
-            try:
-                import PySimpleGUI as sg
-            except ModuleNotFoundError:
-                print("You must install PySimpleGUI!")
-                sys.exit()
-            sg.theme(settings["tktheme"])
-        elif settings["backend"] == "qt":
+        if settings["backend"] == "qt":
             try:
                 import PySimpleGUIQt as sg
             except ModuleNotFoundError:
                 print("You must install PySimpleGUIQt!")
                 sys.exit()
             sg.theme(settings["qttheme"])
+        elif settings["backend"] == "tk":
+            try:
+                import PySimpleGUI as sg
+            except ModuleNotFoundError:
+                print("You must install PySimpleGUI!")
+                sys.exit()
+            sg.theme(settings["tktheme"])
         current_backend = settings["backend"]
     else:
         log("Error: backend invalid in settings file", "critical")
