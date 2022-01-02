@@ -80,20 +80,22 @@ def main():
         recreatesettings(f"{root}/settings.toml")
     settings = toml.load(f"{root}/settings.toml")
 
-    if settings["backend"] == "tk":
-        try:
-            import PySimpleGUI as sg
-        except ModuleNotFoundError:
-            print("You must install PySimpleGUI!")
-            sys.exit()
-        sg.theme(settings["tktheme"])
-    elif settings["backend"] == "qt":
-        try:
-            import PySimpleGUIQt as sg
-        except ModuleNotFoundError:
-            print("You must install PySimpleGUIQt!")
-            sys.exit()
-        sg.theme(settings["qttheme"])
+    valid_backends = ["tk", "qt"]
+    if settings["backend"] in valid_backends:
+        if settings["backend"] == "tk":
+            try:
+                import PySimpleGUI as sg
+            except ModuleNotFoundError:
+                print("You must install PySimpleGUI!")
+                sys.exit()
+            sg.theme(settings["tktheme"])
+        elif settings["backend"] == "qt":
+            try:
+                import PySimpleGUIQt as sg
+            except ModuleNotFoundError:
+                print("You must install PySimpleGUIQt!")
+                sys.exit()
+            sg.theme(settings["qttheme"])
     else:
         log("Error: backend invalid in settings file", "critical")
 
@@ -127,6 +129,8 @@ def main():
                 [sg.Button("Modify a pack")],
                 [sg.Text("")],
                 [sg.Button("Download packwiz")],
+                [sg.Text("")],
+                [sg.Button("Settings")],
                 [sg.Text("")],
                 [sg.Button("Close packwiz-gui")]
                 ]
@@ -242,7 +246,9 @@ def main():
                                 [sg.Text("")],
                                 ]
                     pack_edit_window = sg.Window("Editing Pack", pack_edit)
+
                     # Editing Packs
+
                     while True:
                         pack_edit_event, pack_edit_values = pack_edit_window.read()
                         source = pack_edit_values["source"]
@@ -351,6 +357,25 @@ def main():
                         os.chdir(root)
                         shutil.rmtree(f"{pack_root}")
                         print(f"Pack {name} deleted.")
+            main_menu_window.UnHide()
+
+        if main_menu_event == "Settings":
+            modify_settings = [
+                              [sg.Text("backend:"), sg.Combo(["tk", "qt"], key="backend")],
+                              [sg.Button("Ok")]
+                              ]
+            main_menu_window.hide()
+            modify_settings_window = sg.Window("Modify settings", modify_settings)
+            modify_settings_event, modify_settings_values = modify_settings_window.read()
+            if modify_settings_values["backend"] in valid_backends:
+                settings["backend"] = modify_settings_values["backend"]
+                sg.popup("Reopen to see the new backend!")
+                with open(f"{root}/settings.toml", "w") as settings_file:
+                    toml.dump(settings, settings_file)
+                sys.exit()
+            elif modify_settings_values["backend"] is not None:
+                print(modify_settings_values["backend"])
+                sg.popup("Invalid backend.")
             main_menu_window.UnHide()
 
         if main_menu_event == "Download packwiz":
