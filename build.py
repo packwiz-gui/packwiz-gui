@@ -12,12 +12,13 @@ else:
     python = "python3"
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "pyinstaller", "cxfreeze", "remove"])
+    opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "deps-nobuild", "pyinstaller", "cxfreeze", "remove"])
     if opts == []:
         raise getopt.GetoptError("")
 except getopt.GetoptError:
     print("Usage:")
     print("      --deps:             Install (python-only) deps")
+    print("      --deps-nobuild:     Install (non-build related, python-only) deps")
     print("      --pyinstaller:      Compile with pyinstaller")
     print("      --cxfreeze:         Compile with cx_freeze")
     print("  -r, --remove:           Cleanup build directories")
@@ -50,6 +51,8 @@ def compile(builder):
 for opt, arg in opts:
     if opt == "--deps":
         os.system(f"{python} -m pip install -r {root}/requirements.txt")
+    if opt == "--deps-nobuild":
+        os.system(f"{python} -m pip install -r {root}/requirements-nobuild.txt")
     elif opt == "--pyinstaller":
         compile("pyinstaller")
     elif opt == "--cxfreeze":

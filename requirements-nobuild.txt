@@ -1,0 +1,6 @@
+PySide2==5.15.2
+PySimpleGUI==4.55.1
+PySimpleGUIQt==0.35.0
+shiboken2==5.15.2
+tomli==2.0.0
+tomli_w==1.0.0
