@@ -134,16 +134,16 @@ def main():
     else:
         log(f"packwiz binary is {packwiz}", "debug")
     main_menu = [
-                [sg.Text("")],
-                [sg.Button("Create a new pack")],
-                [sg.Text("")],
-                [sg.Button("Modify pack")],
-                [sg.Text("")],
-                [sg.Button("Download packwiz")],
-                [sg.Text("")],
-                [sg.Button("Settings")],
-                [sg.Text("")],
-                [sg.Button("Close packwiz-gui")]
+                [sg.T("")],
+                [sg.B("Create a new pack")],
+                [sg.T("")],
+                [sg.B("Modify pack")],
+                [sg.T("")],
+                [sg.B("Download packwiz")],
+                [sg.T("")],
+                [sg.B("Settings")],
+                [sg.T("")],
+                [sg.B("Close packwiz-gui")]
                 ]
     main_menu_window = sg.Window("Main Menu", main_menu)
     while True:
@@ -153,14 +153,14 @@ def main():
             break
         if main_menu_event == "Create a new pack":
             pack_create = [
-                        [sg.Text("Pack name:"), sg.InputText(key="name")],
-                        [sg.Text("Author:"), sg.InputText(key="author")],
-                        [sg.Text("Pack Version:"), sg.InputText(key="version")],
-                        [sg.Text("Minecraft Version:"), sg.InputText(key="minecraftversion")],
-                        [sg.Text("Modloader:"), sg.Combo(["forge", "fabric"], key="modloader")],
-                        [sg.Text("Modloader Version:"), sg.InputText(key="modloaderversion")],
-                        [sg.Button("Create"), sg.Button("Close")],
-                        [sg.Text("")],
+                        [sg.T("Pack name:"), sg.In(key="name")],
+                        [sg.T("Author:"), sg.In(key="author")],
+                        [sg.T("Pack Version:"), sg.In(key="version")],
+                        [sg.T("Minecraft Version:"), sg.In(key="minecraftversion")],
+                        [sg.T("Modloader:"), sg.Combo(["forge", "fabric"], key="modloader")],
+                        [sg.T("Modloader Version:"), sg.In(key="modloaderversion")],
+                        [sg.B("Create"), sg.B("Close")],
+                        [sg.T("")],
                         ]
             main_menu_window.hide()
             pack_create_window = sg.Window("Create new pack", pack_create)
@@ -201,12 +201,12 @@ def main():
             for instance in os.listdir(f"{root}/instances"):
                 instances_list = instances_list + instance + "\n"
             pack_list = [
-                        [sg.Text("Packs:")],
-                        [sg.Text(instances_list)],
-                        [sg.Text("Pack Name:"), sg.InputText(key="packname")],
-                        [sg.Button("Open")],
-                        [sg.Button("Close")],
-                        [sg.Button("Delete", button_color="red")],
+                        [sg.T("Packs:")],
+                        [sg.T(instances_list)],
+                        [sg.T("Pack Name:"), sg.In(key="packname")],
+                        [sg.B("Open")],
+                        [sg.B("Close")],
+                        [sg.B("Delete", button_color="red")],
                         ]
             main_menu_window.hide()
             pack_list_window = sg.Window("Listing existing packs", pack_list)
@@ -221,26 +221,26 @@ def main():
                     os.chdir(pack_root)
                     pack_toml = opentoml(f"{pack_root}/pack.toml")
                     pack_edit = [
-                                [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"], key="source")],
-                                [sg.Text("Mod: "), sg.InputText(key="mod")],
-                                [sg.Text("")],
-                                [sg.Button("Add Mod")],
-                                [sg.Button("Remove Mod")],
-                                [sg.Button("View Installed Mods")],
-                                [sg.Button("Export to CF pack")],
-                                [sg.Button("Refresh pack")],
-                                [sg.Button("Update all mods")],
-                                [sg.Button("Update mod")],
-                                [sg.Text("")],
-                                [sg.Text("Pack name:"), sg.InputText(pack_toml["name"], key="name")],
-                                [sg.Text("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
-                                [sg.Text("Author:"), sg.InputText(pack_toml["author"], key="author")],
-                                [sg.Text("Pack Version:"), sg.InputText(pack_toml["version"], key="version")],
-                                [sg.Text("Minecraft Version:"), sg.InputText(pack_toml["versions"]["minecraft"], key="minecraftversion")],
-                                [sg.Text("Changing modloader is currently unsupported.")],
-                                [sg.Button("Change")],
-                                [sg.Button("Close")],
-                                [sg.Text("")],
+                                [sg.T("Source:"), sg.Combo(["modrinth", "curseforge"], key="source")],
+                                [sg.T("Mod: "), sg.In(key="mod")],
+                                [sg.T("")],
+                                [sg.B("Add Mod")],
+                                [sg.B("Remove Mod")],
+                                [sg.B("View Installed Mods")],
+                                [sg.B("Export to CF pack")],
+                                [sg.B("Refresh pack")],
+                                [sg.B("Update all mods")],
+                                [sg.B("Update mod")],
+                                [sg.T("")],
+                                [sg.T("Pack name:"), sg.In(pack_toml["name"], key="name")],
+                                [sg.T("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
+                                [sg.T("Author:"), sg.In(pack_toml["author"], key="author")],
+                                [sg.T("Pack Version:"), sg.In(pack_toml["version"], key="version")],
+                                [sg.T("Minecraft Version:"), sg.In(pack_toml["versions"]["minecraft"], key="minecraftversion")],
+                                [sg.T("Changing modloader is currently unsupported.")],
+                                [sg.B("Change")],
+                                [sg.B("Close")],
+                                [sg.T("")],
                                 ]
                     pack_edit_window = sg.Window("Edit Pack", pack_edit)
                     while True:
@@ -351,9 +351,9 @@ def main():
             main_menu_window.UnHide()
         if main_menu_event == "Settings":
             modify_settings = [
-                              [sg.Text("Backend:"), sg.Combo(["tk", "qt"], key="backend", default_value=current_backend)],
+                              [sg.T("Backend:"), sg.Combo(["tk", "qt"], key="backend", default_value=current_backend)],
                               [sg.Combo(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
-                              [sg.Button("Ok")]
+                              [sg.B("Ok")]
                               ]
             main_menu_window.hide()
             modify_settings_window = sg.Window("Modify settings", modify_settings)
