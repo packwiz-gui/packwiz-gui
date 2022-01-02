@@ -6,12 +6,18 @@ import sys
 import getopt
 import shutil
 
+if platform.system() == "windows":
+    python = "python"
+else:
+    python = "python3"
+
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "r", ["pyinstaller", "cxfreeze", "remove"])
+    opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "pyinstaller", "cxfreeze", "remove"])
     if opts == []:
         raise getopt.GetoptError("")
 except getopt.GetoptError:
     print("Usage:")
+    print("      --deps:             Install (python-only) deps")
     print("      --pyinstaller:      Compile with pyinstaller")
     print("      --cxfreeze:         Compile with cx_freeze")
     print("  -r, --remove:           Cleanup build directories")
@@ -42,7 +48,9 @@ def compile(builder):
         print(f"Error: error detected, code {command}.")
 
 for opt, arg in opts:
-    if opt == "--pyinstaller":
+    if opt == "--deps":
+        os.system(f"{python} -m pip install -r {root}/requirements.txt")
+    elif opt == "--pyinstaller":
         compile("pyinstaller")
     elif opt == "--cxfreeze":
         compile("cxfreeze")
