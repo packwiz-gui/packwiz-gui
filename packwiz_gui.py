@@ -157,7 +157,7 @@ def main():
                         [sg.T("Author:"), sg.In(key="author")],
                         [sg.T("Pack Version:"), sg.In(key="version")],
                         [sg.T("Minecraft Version:"), sg.In(key="minecraftversion")],
-                        [sg.T("Modloader:"), sg.Combo(["forge", "fabric"], key="modloader")],
+                        [sg.T("Modloader:"), sg.Drop(["forge", "fabric"], key="modloader")],
                         [sg.T("Modloader Version:"), sg.In(key="modloaderversion")],
                         [sg.B("Create"), sg.B("Close")],
                         [sg.T("")],
@@ -221,7 +221,7 @@ def main():
                     os.chdir(pack_root)
                     pack_toml = opentoml(f"{pack_root}/pack.toml")
                     pack_edit = [
-                                [sg.T("Source:"), sg.Combo(["modrinth", "curseforge"], key="source")],
+                                [sg.T("Source:"), sg.Drop(["modrinth", "curseforge"], key="source")],
                                 [sg.T("Mod: "), sg.In(key="mod")],
                                 [sg.T("")],
                                 [sg.B("Add Mod")],
@@ -351,8 +351,9 @@ def main():
             main_menu_window.UnHide()
         if main_menu_event == "Settings":
             modify_settings = [
-                              [sg.T("Backend:"), sg.Combo(["tk", "qt"], key="backend", default_value=current_backend)],
-                              [sg.Combo(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
+                              [sg.T("Backend:"), sg.Drop(["tk", "qt"], key="backend", default_value=current_backend)],
+                              [sg.Drop(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
+                              [sg.CB("Use git", key="git", default=settings["usegit"])],
                               [sg.B("Ok")]
                               ]
             main_menu_window.hide()
@@ -360,15 +361,20 @@ def main():
             modify_settings_event, modify_settings_values = modify_settings_window.read()
             if modify_settings_event == "Ok":
                 if modify_settings_values["backend"] in valid_backends and modify_settings_values["theme"] in sg.theme_list():
-                    settings["backend"] = modify_settings_values["backend"]
-                    settings[f"{current_backend}theme"] = modify_settings_values["theme"]
+                    settings["usegit"] = modify_settings_values["git"]
                     dumptoml(f"{root}/settings.toml", settings)
-                    log("Restart to see effect.", "printsg")
+                    if modify_settings_values["backend"] != settings["backend"] or modify_settings_values["theme"] != settings[f"{current_backend}theme"]:
+                        settings["backend"] = modify_settings_values["backend"]
+                        settings[f"{current_backend}theme"] = modify_settings_values["theme"]
+                        dumptoml(f"{root}/settings.toml", settings)
+                        log("Restart to see effect.", "printsg")
+                        sys.exit()
+                    else:
+                        main_menu_window.UnHide()
+                    modify_settings_window.close()
                 else:
                     log("Invalid settings!", "printerror")
-                sys.exit()
             modify_settings_window.close()
-            main_menu_window.UnHide()
         if main_menu_event == "Download packwiz":
             if platform.system() == "Windows":
                 webbrowser.get("windows-default").open("https://github.com/comp500/packwiz/#installation")
