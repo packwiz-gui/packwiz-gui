@@ -73,6 +73,11 @@ def main():
         elif logtype == "criticalsg":
             logging.critical(msg=msg)
             sg.popup_error(msg)
+        elif logtype == "print":
+            print(msg)
+        elif logtype == "printerror":
+            print(msg)
+            sg.popup_error(msg)
         elif logtype == "printsg":
             print(msg)
             sg.popup(msg)
@@ -154,7 +159,7 @@ def main():
                 name = pack_create_values["name"]
                 pack_root = f"{root}/instances/{name}"
                 if os.path.isdir(pack_root):
-                    print(f"The pack \"{name}\" already exists!")
+                    log(f"The pack \"{name}\" already exists!", "print")
                 else:
                     author = pack_create_values["author"]
                     pack_version = pack_create_values["version"]
@@ -173,11 +178,11 @@ def main():
                         os.system(f"git commit -m \"Create pack {name}\"")
                     os.chdir(root)
                     if pack_create_command != 0:
-                        print(f"There was an error creating the pack \"{name}\"!")
+                        log(f"There was an error creating the pack \"{name}\"!", "print")
                         log(f"error code {pack_create_command}", "debug")
                         shutil.rmtree(pack_root)
                     else:
-                        print(f"Pack \"{name}\" created.")
+                        log(f"Pack \"{name}\" created.", "print")
             pack_create_window.close()
             main_menu_window.UnHide()
 
@@ -201,7 +206,7 @@ def main():
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
                 if not os.path.isfile(f"{pack_root}/pack.toml"):
-                    print(f"The pack \"{name}\" does not exist!")
+                    log(f"The pack \"{name}\" does not exist!", "print")
                 else:
                     os.chdir(pack_root)
                     pack_toml = toml.load("pack.toml")
@@ -239,10 +244,10 @@ def main():
                             os.chdir(pack_root)
                             mod_add_command = os.system(f"{packwiz} {source} install {mod}")
                             if mod_add_command != 0:
-                                print(f"There was an error adding mod \"{mod}\" from source \"{source}\"!")
+                                log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "print")
                                 log(f"error code {mod_add_command}", "debug")
                             else:
-                                print(f"Successfully added mod \"{mod}\" from source \"{source}\".")
+                                log(f"Successfully added mod \"{mod}\" from source \"{source}\".", "print")
                                 if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Add {mod}\"")
@@ -250,10 +255,10 @@ def main():
                             os.chdir(f"{pack_root}")
                             mod_remove_command = os.system(f"{packwiz} remove {mod}")
                             if mod_remove_command != 0:
-                                print(f"There was an error removing mod \"{mod}\"!")
+                                log(f"There was an error removing mod \"{mod}\"!", "print")
                                 log(f"error code {mod_remove_command}", "debug")
                             else:
-                                print(f"Mod \"{mod}\" successfully removed.")
+                                log(f"Mod \"{mod}\" successfully removed.", "print")
                                 if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Remove {mod}\"")
@@ -265,10 +270,10 @@ def main():
                         if pack_edit_event == "Export to CF pack":
                             pack_export_command = os.system(f"{packwiz} cf export")
                             if pack_export_command != 0:
-                                print(f"There was an error exporting the pack \"{name}\"!")
+                                log(f"There was an error exporting the pack \"{name}\"!", "print")
                                 log(f"error code {pack_export_command}", "debug")
                             else:
-                                print(f"Pack \"{name}\" successfully exported.")
+                                log(f"Pack \"{name}\" successfully exported.", "print")
                                 if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Export pack {name}\"")
@@ -281,28 +286,28 @@ def main():
                         if pack_edit_event == "Refresh pack":
                             packwiz_refresh = os.system(f"{packwiz} refresh")
                             if packwiz_refresh != 0:
-                                print("There was an error refreshing the pack!")
+                                log("There was an error refreshing the pack!", "print")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
-                                print("Successfully refreshed pack.")
+                                log("Successfully refreshed pack.", "print")
                             if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Refresh pack\"")
                         if pack_edit_event == "Update all mods":
                             packwiz_update_all = os.system(f"{packwiz} update -a")
                             if packwiz_update_all != 0:
-                                print("There was an error updating all mods!")
+                                log("There was an error updating all mods!", "print")
                             else:
-                                print("Updating all mods succeeded.")
+                                log("Updating all mods succeeded.", "print")
                             if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Update all mods\"")
                         if pack_edit_event == "Update mod":
                             packwiz_update_mod = os.system(f"{packwiz} update {mod}")
                             if packwiz_update_mod != 0:
-                                print("There was an error updating your mod(s)!")
+                                log("There was an error updating your mod(s)!", "print")
                             else:
-                                print("Updating your mod(s) succeeded.")
+                                log("Updating your mod(s) succeeded.", "print")
                             if usegit:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Update {mod}\"")
@@ -318,27 +323,27 @@ def main():
                                 os.system("git add .")
                                 os.system("git commit -m \"Modify pack details\"")
                             if packwiz_refresh != 0:
-                                print("There was an error changing the pack details!")
+                                log("There was an error changing the pack details!", "print")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
-                                print("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
+                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.", "print")
             if pack_list_event == "Delete":
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
                 if not os.path.isfile(f"{pack_root}/pack.toml"):
-                    print(f"The pack \"{name}\" does not exist!")
+                    log(f"The pack \"{name}\" does not exist!", "print")
                 else:
                     pack_delete_event = sg.popup_yes_no("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA."
                                                         "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?", title="Are you sure?")
                     if pack_delete_event == "Yes":
                         os.chdir(root)
                         shutil.rmtree(f"{pack_root}")
-                        print(f"Pack {name} deleted.")
+                        log(f"Pack {name} deleted.", "print")
             main_menu_window.UnHide()
         if main_menu_event == "Settings":
             modify_settings = [
-                              [sg.Text("Backend:"), sg.Combo(["tk", "qt"], key="backend")],
-                              [sg.Combo(sg.theme_list(), key="theme")],
+                              [sg.Text("Backend:"), sg.Combo(["tk", "qt"], key="backend", default_value=current_backend)],
+                              [sg.Combo(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
                               [sg.Button("Ok")]
                               ]
             main_menu_window.hide()
@@ -347,10 +352,8 @@ def main():
             if modify_settings_event == "Ok":
                 if modify_settings_values["backend"] in valid_backends:
                     settings["backend"] = modify_settings_values["backend"]
-                    sg.popup("Reopen to see the new backend!")
                     dumpsettings(f"{root}/settings.toml", settings)
-                elif modify_settings_values["backend"] is not None:
-                    print(modify_settings_values["backend"])
+                else:
                     sg.popup("Invalid backend.")
                 if modify_settings_values["theme"] in sg.theme_list():
                     sg.theme(modify_settings_values["theme"])
@@ -358,6 +361,7 @@ def main():
                     dumpsettings(f"{root}/settings.toml", settings)
                 else:
                     log("Invalid theme!", "printsg")
+                log("Restart to see effect!", "printsg")
                 sys.exit()
             modify_settings_window.close()
             main_menu_window.UnHide()
