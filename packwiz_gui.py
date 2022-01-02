@@ -73,31 +73,23 @@ def main():
     def log(msg, logtype):
         if logtype == "debug":
             logging.debug(msg=msg)
-            return True
         elif logtype == "info":
             logging.info(msg=msg)
-            return True
         elif logtype == "warning":
             logging.warning(msg=msg)
-            return True
         elif logtype == "warningsg":
             logging.warning(msg=msg)
             sg.popup_ok_cancel(msg)
-            return True
         elif logtype == "error":
             logging.error(msg=msg)
-            return True
         elif logtype == "errorsg":
             logging.error(msg=msg)
             sg.popup_error(msg)
-            return True
         elif logtype == "critical":
             logging.critical(msg=msg)
-            return True
         elif logtype == "criticalsg":
             logging.critical(msg=msg)
             sg.popup_error(msg)
-            return True
         else:
             raise ValueError("Wrong or no type provided!")
 
@@ -276,7 +268,7 @@ def main():
                         if pack_edit_event == "View Installed Mods":
                             mods_list = ""
                             for mod in os.listdir(f"{pack_root}/mods"):
-                                mods_list = mods_list + mod.replace(".toml", "", 1) + "\n"
+                                mods_list = mods_list + mod[::-1].replace("lmot.", "", 1)[::-1] + "\n"
                             sg.popup(mods_list, title="Installed mods")
                         if pack_edit_event == "Export to CF pack":
                             pack_export_command = os.system(f"{packwiz} cf export")
@@ -305,11 +297,7 @@ def main():
                                 os.system("git add .")
                                 os.system("git commit -m \"Refresh pack\"")
                         if pack_edit_event == "Update all mods":
-                            command_update_all = f"{packwiz} update -a"
-                            if platform.system() == "Windows":
-                                packwiz_update_all = os.system(f"cmd /c \"{command_update_all}\"")
-                            else:
-                                packwiz_update_all = os.system(f"bash -c \"{command_update_all}\"")
+                            packwiz_update_all = os.system(f"{packwiz} update -a")
                             if packwiz_update_all != 0:
                                 print("There was an error updating all mods!")
                             else:
@@ -318,11 +306,7 @@ def main():
                                 os.system("git add .")
                                 os.system("git commit -m \"Update all mods\"")
                         if pack_edit_event == "Update mod":
-                            command_update_mod = f"{packwiz} update {mod}"
-                            if platform.system() == "Windows":
-                                packwiz_update_mod = os.system(f"cmd /c \"{command_update_mod}\"")
-                            else:
-                                packwiz_update_mod = os.system(f"bash -c \"{command_update_mod}\"")
+                            packwiz_update_mod = os.system(f"{packwiz} update {mod}")
                             if packwiz_update_mod != 0:
                                 print("There was an error updating your mod(s)!")
                             else:
