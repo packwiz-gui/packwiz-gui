@@ -159,7 +159,7 @@ def main():
                 name = pack_create_values["name"]
                 pack_root = f"{root}/instances/{name}"
                 if os.path.isdir(pack_root):
-                    log(f"The pack \"{name}\" already exists!", "print")
+                    log(f"The pack \"{name}\" already exists!", "printerror")
                 else:
                     author = pack_create_values["author"]
                     pack_version = pack_create_values["version"]
@@ -178,11 +178,11 @@ def main():
                         os.system(f"git commit -m \"Create pack {name}\"")
                     os.chdir(root)
                     if pack_create_command != 0:
-                        log(f"There was an error creating the pack \"{name}\"!", "print")
+                        log(f"There was an error creating the pack \"{name}\"!", "printerror")
                         log(f"error code {pack_create_command}", "debug")
                         shutil.rmtree(pack_root)
                     else:
-                        log(f"Pack \"{name}\" created.", "print")
+                        log(f"Pack \"{name}\" created.", "printsg")
             pack_create_window.close()
             main_menu_window.UnHide()
 
@@ -206,7 +206,7 @@ def main():
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
                 if not os.path.isfile(f"{pack_root}/pack.toml"):
-                    log(f"The pack \"{name}\" does not exist!", "print")
+                    log(f"The pack \"{name}\" does not exist!", "printerror")
                 else:
                     os.chdir(pack_root)
                     pack_toml = toml.load("pack.toml")
@@ -244,10 +244,10 @@ def main():
                             os.chdir(pack_root)
                             mod_add_command = os.system(f"{packwiz} {source} install {mod}")
                             if mod_add_command != 0:
-                                log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "print")
+                                log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "printerror")
                                 log(f"error code {mod_add_command}", "debug")
                             else:
-                                log(f"Successfully added mod \"{mod}\" from source \"{source}\".", "print")
+                                log(f"Successfully added mod \"{mod}\" from source \"{source}\".", "printsg")
                                 if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Add {mod}\"")
@@ -255,10 +255,10 @@ def main():
                             os.chdir(f"{pack_root}")
                             mod_remove_command = os.system(f"{packwiz} remove {mod}")
                             if mod_remove_command != 0:
-                                log(f"There was an error removing mod \"{mod}\"!", "print")
+                                log(f"There was an error removing mod \"{mod}\"!", "printerror")
                                 log(f"error code {mod_remove_command}", "debug")
                             else:
-                                log(f"Mod \"{mod}\" successfully removed.", "print")
+                                log(f"Mod \"{mod}\" successfully removed.", "printsg")
                                 if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Remove {mod}\"")
@@ -270,10 +270,10 @@ def main():
                         if pack_edit_event == "Export to CF pack":
                             pack_export_command = os.system(f"{packwiz} cf export")
                             if pack_export_command != 0:
-                                log(f"There was an error exporting the pack \"{name}\"!", "print")
+                                log(f"There was an error exporting the pack \"{name}\"!", "printerror")
                                 log(f"error code {pack_export_command}", "debug")
                             else:
-                                log(f"Pack \"{name}\" successfully exported.", "print")
+                                log(f"Pack \"{name}\" successfully exported.", "printsg")
                                 if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Export pack {name}\"")
@@ -286,28 +286,28 @@ def main():
                         if pack_edit_event == "Refresh pack":
                             packwiz_refresh = os.system(f"{packwiz} refresh")
                             if packwiz_refresh != 0:
-                                log("There was an error refreshing the pack!", "print")
+                                log("There was an error refreshing the pack!", "printerror")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
-                                log("Successfully refreshed pack.", "print")
+                                log("Successfully refreshed pack.", "printsg")
                             if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Refresh pack\"")
                         if pack_edit_event == "Update all mods":
                             packwiz_update_all = os.system(f"{packwiz} update -a")
                             if packwiz_update_all != 0:
-                                log("There was an error updating all mods!", "print")
+                                log("There was an error updating all mods!", "printerror")
                             else:
-                                log("Updating all mods succeeded.", "print")
+                                log("Updating all mods succeeded.", "printsg")
                             if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Update all mods\"")
                         if pack_edit_event == "Update mod":
                             packwiz_update_mod = os.system(f"{packwiz} update {mod}")
                             if packwiz_update_mod != 0:
-                                log("There was an error updating your mod(s)!", "print")
+                                log("There was an error updating your mod(s)!", "printerror")
                             else:
-                                log("Updating your mod(s) succeeded.", "print")
+                                log("Updating your mod(s) succeeded.", "printsg")
                             if usegit:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Update {mod}\"")
@@ -323,22 +323,22 @@ def main():
                                 os.system("git add .")
                                 os.system("git commit -m \"Modify pack details\"")
                             if packwiz_refresh != 0:
-                                log("There was an error changing the pack details!", "print")
+                                log("There was an error changing the pack details!", "printerror")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
-                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.", "print")
+                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.", "printsg")
             if pack_list_event == "Delete":
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
                 if not os.path.isfile(f"{pack_root}/pack.toml"):
-                    log(f"The pack \"{name}\" does not exist!", "print")
+                    log(f"The pack \"{name}\" does not exist!", "printerror")
                 else:
                     pack_delete_event = sg.popup_yes_no("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA."
                                                         "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?", title="Are you sure?")
                     if pack_delete_event == "Yes":
                         os.chdir(root)
                         shutil.rmtree(f"{pack_root}")
-                        log(f"Pack {name} deleted.", "print")
+                        log(f"Pack {name} deleted.", "printsg")
             main_menu_window.UnHide()
         if main_menu_event == "Settings":
             modify_settings = [
@@ -360,8 +360,8 @@ def main():
                     settings[f"{current_backend}theme"] = modify_settings_values["theme"]
                     dumpsettings(f"{root}/settings.toml", settings)
                 else:
-                    log("Invalid theme!", "printsg")
-                log("Restart to see effect!", "printsg")
+                    log("Invalid theme!", "printerror")
+                log("Restart to see effect.", "printsg")
                 sys.exit()
             modify_settings_window.close()
             main_menu_window.UnHide()
