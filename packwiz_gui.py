@@ -15,12 +15,11 @@ def opentoml(f):
         return tomli.load(toml_file)
 
 def recreatesettings(f):
-    settings = """
-                backend = \"tk\" # Default: tk
-                tktheme = \"DarkGrey9\" # Default: DarkGrey9
-                qttheme = \"SystemDefaultForReal\" # Default: SystemDefaultForReal
-                usegit = false # Default: false
-               """
+    settings = """backend = \"tk\" # Default: tk
+tktheme = \"DarkGrey9\" # Default: DarkGrey9
+qttheme = \"SystemDefaultForReal\" # Default: SystemDefaultForReal
+usegit = false # Default: false
+"""
     with open(f, "w") as settings_file:
         settings_file.write(settings)
 
