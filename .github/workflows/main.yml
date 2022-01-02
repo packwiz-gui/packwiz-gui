@@ -9,19 +9,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install dependencies
-        run: python3 build.py --deps
-      - name: Compile pyinstaller
-        run: python3 build.py --pyinstaller
+      - name: Install dependencies, compile pyinstaller, compile cxfreeze
+        run: python3 build.py --deps --pyinstaller --cxfreeze
       - name: Upload pyinstaller
         uses: actions/upload-artifact@v2.2.4
         with:
           name: packwiz_gui_linux_pyinstaller
           path: pyinstaller/dist
-      - name: Cleanup
-        run: python3 build.py -r
-      - name: Compile cxfreeze
-        run: python3 build.py --cxfreeze
       - name: Upload cxfreeze
         uses: actions/upload-artifact@v2.2.4
         with:
@@ -35,19 +29,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install dependencies
-        run: python3 build.py --deps
-      - name: Compile pyinstaller
-        run: python3 build.py --pyinstaller
+      - name: Install dependencies, compile pyinstaller, compile cxfreeze
+        run: python3 build.py --deps --pyinstaller --cxfreeze
       - name: Upload pyinstaller
         uses: actions/upload-artifact@v2.2.4
         with:
           name: packwiz_gui_windows_pyinstaller
           path: pyinstaller/dist
-      - name: Cleanup
-        run: python3 build.py -r
-      - name: Compile cxfreeze
-        run: python3 build.py --cxfreeze
       - name: Upload cxfreeze
         uses: actions/upload-artifact@v2.2.4
         with:
@@ -61,19 +49,13 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install dependencies
-        run: python3 build.py --deps
-      - name: Compile pyinstaller
-        run: python3 build.py --pyinstaller
+      - name: Install dependencies, compile pyinstaller, compile cxfreeze
+        run: python3 build.py --deps --pyinstaller --cxfreeze
       - name: Upload pyinstaller
         uses: actions/upload-artifact@v2.2.4
         with:
           name: packwiz_gui_macos_pyinstaller
           path: pyinstaller/dist
-      - name: Cleanup
-        run: python3 build.py -r
-      - name: Compile cxfreeze
-        run: python3 build.py --cxfreeze
       - name: Upload cxfreeze
         uses: actions/upload-artifact@v2.2.4
         with:
