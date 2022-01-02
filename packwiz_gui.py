@@ -137,7 +137,7 @@ def main():
                 [sg.Text("")],
                 [sg.Button("Create a new pack")],
                 [sg.Text("")],
-                [sg.Button("Modify a pack")],
+                [sg.Button("Modify pack")],
                 [sg.Text("")],
                 [sg.Button("Download packwiz")],
                 [sg.Text("")],
@@ -163,7 +163,7 @@ def main():
                         [sg.Text("")],
                         ]
             main_menu_window.hide()
-            pack_create_window = sg.Window("Creating a new pack", pack_create)
+            pack_create_window = sg.Window("Create new pack", pack_create)
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
                 name = pack_create_values["name"]
@@ -196,7 +196,7 @@ def main():
             pack_create_window.close()
             main_menu_window.UnHide()
 
-        if main_menu_event == "Modify a pack":
+        if main_menu_event == "Modify pack":
             instances_list = ""
             for instance in os.listdir(f"{root}/instances"):
                 instances_list = instances_list + instance + "\n"
@@ -242,7 +242,7 @@ def main():
                                 [sg.Button("Close")],
                                 [sg.Text("")],
                                 ]
-                    pack_edit_window = sg.Window("Editing Pack", pack_edit)
+                    pack_edit_window = sg.Window("Edit Pack", pack_edit)
                     while True:
                         pack_edit_event, pack_edit_values = pack_edit_window.read()
                         source = pack_edit_values["source"]
