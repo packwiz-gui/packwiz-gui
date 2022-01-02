@@ -344,24 +344,21 @@ def main():
             main_menu_window.hide()
             modify_settings_window = sg.Window("Modify settings", modify_settings)
             modify_settings_event, modify_settings_values = modify_settings_window.read()
-            if modify_settings_values["backend"] in valid_backends:
-                settings["backend"] = modify_settings_values["backend"]
-                sg.popup("Reopen to see the new backend!")
-                dumpsettings(f"{root}/settings.toml", settings)
+            if modify_settings_event == "Ok":
+                if modify_settings_values["backend"] in valid_backends:
+                    settings["backend"] = modify_settings_values["backend"]
+                    sg.popup("Reopen to see the new backend!")
+                    dumpsettings(f"{root}/settings.toml", settings)
+                elif modify_settings_values["backend"] is not None:
+                    print(modify_settings_values["backend"])
+                    sg.popup("Invalid backend.")
+                if modify_settings_values["theme"] in sg.theme_list():
+                    sg.theme(modify_settings_values["theme"])
+                    settings[f"{current_backend}theme"] = modify_settings_values["theme"]
+                    dumpsettings(f"{root}/settings.toml", settings)
+                else:
+                    log("Invalid theme!", "printsg")
                 sys.exit()
-            elif modify_settings_values["backend"] == "":
-                pass
-            elif modify_settings_values["backend"] is not None:
-                print(modify_settings_values["backend"])
-                sg.popup("Invalid backend.")
-            if modify_settings_values["theme"] in sg.theme_list():
-                sg.theme(modify_settings_values["theme"])
-                settings[f"{current_backend}theme"] = modify_settings_values["theme"]
-                dumpsettings(f"{root}/settings.toml", settings)
-            elif modify_settings_values["theme"] == "":
-                pass
-            else:
-                log("Invalid theme!", "printsg")
             modify_settings_window.close()
             main_menu_window.UnHide()
         if main_menu_event == "Download packwiz":
