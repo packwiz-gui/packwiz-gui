@@ -20,14 +20,11 @@ def main():
     except getopt.GetoptError:
         print("Error: Unknown flag.\nUse --help to see available commands.")
         sys.exit()
-
     loglevel = 15
-
     if os.path.isdir(sys.path[0]):
         root = sys.path[0]
     else:
         root = os.getcwd()
-
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             print("")
@@ -47,7 +44,6 @@ def main():
             else:
                 print("settings.toml does not exist! Run normally to create.")
                 sys.exit()
-
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
     logging_handlers = [logging_file_handler, logging_stdout_handler]
@@ -73,13 +69,15 @@ def main():
         elif logtype == "criticalsg":
             logging.critical(msg=msg)
             sg.popup_error(msg)
+        elif logtype == "printsg":
+            print(msg)
+            sg.popup(msg)
         else:
             raise ValueError("Wrong or no type provided!")
 
     if not os.path.isfile(f"{root}/settings.toml"):
         recreatesettings(f"{root}/settings.toml")
     settings = toml.load(f"{root}/settings.toml")
-
     valid_backends = ["tk", "qt"]
     if settings["backend"] in valid_backends:
         if settings["backend"] == "tk":
@@ -98,7 +96,6 @@ def main():
             sg.theme(settings["qttheme"])
     else:
         log("Error: backend invalid in settings file", "critical")
-
     if settings["usegit"] == True:
         usegit = True
     else:
@@ -109,7 +106,6 @@ def main():
     else:
         packwiz = f"{root}/bin/packwiz"
         os.system(f"chmod +x {packwiz}")
-
     if not os.path.isdir(f"{root}/instances"):
         os.mkdir(f"{root}/instances")
         log("No instances folder, creating...", "warning")
@@ -120,8 +116,6 @@ def main():
         log("Packwiz does not exist! Please download packwiz and put it in the bin folder!", "criticalsg")
     else:
         log(f"packwiz binary is {packwiz}", "debug")
-
-    # All the stuff inside your window.
     main_menu = [
                 [sg.Text("")],
                 [sg.Button("Create a new pack")],
@@ -134,20 +128,12 @@ def main():
                 [sg.Text("")],
                 [sg.Button("Close packwiz-gui")]
                 ]
-
-    # Create the Window
     main_menu_window = sg.Window("Main Menu", main_menu)
-
-    # Event Loop to process "events" and get the "values" of the inputs
     while True:
         main_menu_event, main_menu_values = main_menu_window.read()
-        # Main menu close check
         if main_menu_event in (sg.WIN_CLOSED, "Close packwiz-gui"):
             main_menu_window.close()
             break
-
-        # Main Menu
-
         if main_menu_event == "Create a new pack":
             pack_create = [
                         [sg.Text("Pack name:"), sg.InputText(key="name")],
@@ -161,9 +147,6 @@ def main():
                         ]
             main_menu_window.hide()
             pack_create_window = sg.Window("Creating a new pack", pack_create)
-
-            # Creating a new pack
-
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
                 name = pack_create_values["name"]
@@ -210,9 +193,6 @@ def main():
                         ]
             main_menu_window.hide()
             pack_list_window = sg.Window("Listing existing packs", pack_list)
-
-            # Open existing packs
-
             pack_list_event, pack_list_values = pack_list_window.read()
             pack_list_window.close()
             if pack_list_event == "Open":
@@ -246,14 +226,10 @@ def main():
                                 [sg.Text("")],
                                 ]
                     pack_edit_window = sg.Window("Editing Pack", pack_edit)
-
-                    # Editing Packs
-
                     while True:
                         pack_edit_event, pack_edit_values = pack_edit_window.read()
                         source = pack_edit_values["source"]
                         mod = pack_edit_values["mod"]
-                        # Editing window close check
                         if pack_edit_event in (sg.WIN_CLOSED, "Close"):
                             pack_edit_window.close()
                             break
@@ -344,7 +320,6 @@ def main():
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
                                 print("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.")
-
             if pack_list_event == "Delete":
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
@@ -358,7 +333,6 @@ def main():
                         shutil.rmtree(f"{pack_root}")
                         print(f"Pack {name} deleted.")
             main_menu_window.UnHide()
-
         if main_menu_event == "Settings":
             modify_settings = [
                               [sg.Text("backend:"), sg.Combo(["tk", "qt"], key="backend")],
@@ -377,7 +351,6 @@ def main():
                 print(modify_settings_values["backend"])
                 sg.popup("Invalid backend.")
             main_menu_window.UnHide()
-
         if main_menu_event == "Download packwiz":
             if platform.system() == "Windows":
                 webbrowser.get("windows-default").open("https://github.com/comp500/packwiz/#installation")
