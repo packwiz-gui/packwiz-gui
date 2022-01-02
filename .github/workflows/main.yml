@@ -10,7 +10,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: python3 -m pip install cx_freeze PyInstaller PySimpleGUI PySimpleGUIQt
+        run: python3 build.py --deps
       - name: Compile pyinstaller
         run: python3 build.py --pyinstaller
       - name: Upload pyinstaller
@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: python3 -m pip install cx_freeze PyInstaller PySimpleGUI PySimpleGUIQt
+        run: python3 build.py --deps
       - name: Compile pyinstaller
         run: python3 build.py --pyinstaller
       - name: Upload pyinstaller
@@ -62,7 +62,7 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: python3 -m pip install cx_freeze PyInstaller PySimpleGUI PySimpleGUIQt
+        run: python3 build.py --deps
       - name: Compile pyinstaller
         run: python3 build.py --pyinstaller
       - name: Upload pyinstaller

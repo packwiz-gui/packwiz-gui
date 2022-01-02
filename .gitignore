@@ -1,8 +1,12 @@
+# Folders that are created by this.
+bin/
+instances/
+pyinstaller/
+cxfreeze/
+# Files that are created by this.
+log.txt
+settings.toml
+# Misc files (cache, metadata).
 __pycache__/
 .DS_Store/
 .idea/
-bin/
-instances/
-log.txt
-pyinstaller/
-cxfreeze/
