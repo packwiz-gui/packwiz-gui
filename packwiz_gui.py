@@ -350,18 +350,13 @@ def main():
             modify_settings_window = sg.Window("Modify settings", modify_settings)
             modify_settings_event, modify_settings_values = modify_settings_window.read()
             if modify_settings_event == "Ok":
-                if modify_settings_values["backend"] in valid_backends:
+                if modify_settings_values["backend"] in valid_backends and modify_settings_values["theme"] in sg.theme_list():
                     settings["backend"] = modify_settings_values["backend"]
-                    dumpsettings(f"{root}/settings.toml", settings)
-                else:
-                    sg.popup("Invalid backend.")
-                if modify_settings_values["theme"] in sg.theme_list():
-                    sg.theme(modify_settings_values["theme"])
                     settings[f"{current_backend}theme"] = modify_settings_values["theme"]
                     dumpsettings(f"{root}/settings.toml", settings)
+                    log("Restart to see effect.", "printsg")
                 else:
-                    log("Invalid theme!", "printerror")
-                log("Restart to see effect.", "printsg")
+                    log("Invalid settings!", "printerror")
                 sys.exit()
             modify_settings_window.close()
             main_menu_window.UnHide()
