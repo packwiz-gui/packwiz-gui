@@ -9,61 +9,44 @@ import webbrowser
 import shutil
 import toml
 
+def recreatesettings(f):
+    settings = "backend = \"tk\" # Default: tk\ntktheme = \"DarkGrey9\" # Default: DarkGrey9\nqttheme = \"SystemDefaultForReal\" # Default: SystemDefaultForReal\nusegit = false # Default: false\n"
+    with open(f, "w") as settings_file:
+        settings_file.write(settings)
+
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "t:qhdg", ["theme=", "qt", "help", "debug", "git"])
+        opts, args = getopt.getopt(sys.argv[1:], "hd", ["help", "debug", "reset-settings"])
     except getopt.GetoptError:
         print("Error: Unknown flag.\nUse --help to see available commands.")
         sys.exit()
 
-    theme = None
-    qtset = False
     loglevel = 15
-    gitset = False
-
-    for opt, arg in opts:
-        if opt in ("-t", "--theme"):
-            theme = arg
-        elif opt in ("-q", "--qt"):
-            qtset = True
-        elif opt in ("-h", "--help"):
-            print("")
-            print("  -t, --theme, <theme>:              - Picks a custom theme.")
-            print("  -q, --qt:                          - Qt instead of tkinter. Requires PySimpleGUIQt.")
-            print("  -h, --help:                        - This help message.")
-            print("  -d, --debug:                       - Verbose logging.")
-            print("  -g, --git:                         - Git support.")
-            print("")
-            sys.exit()
-        elif opt in ("-d", "--debug"):
-            loglevel = 10
-        elif opt in ("-g", "--git"):
-            gitset = True
-
-    if qtset:
-        try:
-            import PySimpleGUIQt as sg
-        except ModuleNotFoundError:
-            print("You must install PySimpleGUIQt!")
-            sys.exit()
-    else:
-        try:
-            import PySimpleGUI as sg
-        except ModuleNotFoundError:
-            print("You must install PySimpleGUI!")
-            sys.exit()
-    if theme is None:
-        if qtset:
-            sg.theme("SystemDefaultForReal")
-        else:
-            sg.theme("DarkGrey9")
-    else:
-        sg.theme(theme)
 
     if os.path.isdir(sys.path[0]):
         root = sys.path[0]
     else:
         root = os.getcwd()
+
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print("")
+            print("  -h, --help:                        - This help message.")
+            print("  -d, --debug:                       - Verbose logging.")
+            print("      --reset-settings:              - Reset the settings file. Permanent.")
+            print("")
+            sys.exit()
+        elif opt in ("-d", "--debug"):
+            loglevel = 10
+        elif opt == "--reset-settings":
+            if os.path.isfile(f"{root}/settings.toml"):
+                os.remove(f"{root}/settings.toml")
+                recreatesettings(f"{root}/settings.toml")
+                print("Successfully reset settings.")
+                sys.exit()
+            else:
+                print("settings.toml does not exist! Run normally to create.")
+                sys.exit()
 
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
@@ -93,6 +76,31 @@ def main():
         else:
             raise ValueError("Wrong or no type provided!")
 
+    if not os.path.isfile(f"{root}/settings.toml"):
+        recreatesettings(f"{root}/settings.toml")
+    settings = toml.load(f"{root}/settings.toml")
+
+    if settings["backend"] == "tk":
+        try:
+            import PySimpleGUI as sg
+        except ModuleNotFoundError:
+            print("You must install PySimpleGUI!")
+            sys.exit()
+        sg.theme(settings["tktheme"])
+    elif settings["backend"] == "qt":
+        try:
+            import PySimpleGUIQt as sg
+        except ModuleNotFoundError:
+            print("You must install PySimpleGUIQt!")
+            sys.exit()
+        sg.theme(settings["qttheme"])
+    else:
+        log("Error: backend invalid in settings file", "critical")
+
+    if settings["usegit"] == True:
+        usegit = True
+    else:
+        usegit = False
     log(f"root dir is {root}", "debug")
     if platform.system() == "Windows":
         packwiz = f"{root}\\bin\\packwiz.exe"
@@ -170,7 +178,7 @@ def main():
                     with open(".packwizignore", "w", encoding="utf8") as pwignore:
                         pwignore.write("*.zip\n.git/**")
                     os.mkdir("mods")
-                    if gitset:
+                    if usegit:
                         os.system("git init")
                         os.system("git add .")
                         os.system(f"git commit -m \"Create pack {name}\"")
@@ -251,7 +259,7 @@ def main():
                                 log(f"error code {mod_add_command}", "debug")
                             else:
                                 print(f"Successfully added mod \"{mod}\" from source \"{source}\".")
-                                if gitset:
+                                if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Add {mod}\"")
                         if pack_edit_event == "Remove Mod":
@@ -262,7 +270,7 @@ def main():
                                 log(f"error code {mod_remove_command}", "debug")
                             else:
                                 print(f"Mod \"{mod}\" successfully removed.")
-                                if gitset:
+                                if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Remove {mod}\"")
                         if pack_edit_event == "View Installed Mods":
@@ -277,7 +285,7 @@ def main():
                                 log(f"error code {pack_export_command}", "debug")
                             else:
                                 print(f"Pack \"{name}\" successfully exported.")
-                                if gitset:
+                                if usegit:
                                     os.system("git add .")
                                     os.system(f"git commit -m \"Export pack {name}\"")
                                 if platform.system() == "Windows":
@@ -293,7 +301,7 @@ def main():
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
                                 print("Successfully refreshed pack.")
-                            if gitset:
+                            if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Refresh pack\"")
                         if pack_edit_event == "Update all mods":
@@ -302,7 +310,7 @@ def main():
                                 print("There was an error updating all mods!")
                             else:
                                 print("Updating all mods succeeded.")
-                            if gitset:
+                            if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Update all mods\"")
                         if pack_edit_event == "Update mod":
@@ -311,7 +319,7 @@ def main():
                                 print("There was an error updating your mod(s)!")
                             else:
                                 print("Updating your mod(s) succeeded.")
-                            if gitset:
+                            if usegit:
                                 os.system("git add .")
                                 os.system(f"git commit -m \"Update {mod}\"")
                         if pack_edit_event == "Change":
@@ -322,7 +330,7 @@ def main():
                             with open("pack.toml", "w", encoding="utf8") as pack_toml_file:
                                 toml.dump(pack_toml, pack_toml_file)
                             packwiz_refresh = os.system(f"{packwiz} refresh")
-                            if gitset:
+                            if usegit:
                                 os.system("git add .")
                                 os.system("git commit -m \"Modify pack details\"")
                             if packwiz_refresh != 0:
