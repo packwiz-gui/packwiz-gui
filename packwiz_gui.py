@@ -7,16 +7,26 @@ import logging
 import getopt
 import webbrowser
 import shutil
-import toml
+import tomli
+import tomli_w
+
+def opentoml(f):
+    with open(f, "rb") as toml_file:
+        return tomli.load(toml_file)
 
 def recreatesettings(f):
-    settings = "backend = \"tk\" # Default: tk\ntktheme = \"DarkGrey9\" # Default: DarkGrey9\nqttheme = \"SystemDefaultForReal\" # Default: SystemDefaultForReal\nusegit = false # Default: false\n"
+    settings = """
+                backend = \"tk\" # Default: tk
+                tktheme = \"DarkGrey9\" # Default: DarkGrey9
+                qttheme = \"SystemDefaultForReal\" # Default: SystemDefaultForReal
+                usegit = false # Default: false
+               """
     with open(f, "w") as settings_file:
         settings_file.write(settings)
 
-def dumpsettings(f, v):
-    with open(f, "w") as settings_file:
-        toml.dump(v, settings_file)
+def dumptoml(f, v):
+    with open(f, "wb") as toml_file:
+        tomli_w.dump(v, toml_file)
 
 def main():
     try:
@@ -86,7 +96,7 @@ def main():
 
     if not os.path.isfile(f"{root}/settings.toml"):
         recreatesettings(f"{root}/settings.toml")
-    settings = toml.load(f"{root}/settings.toml")
+    settings = opentoml(f"{root}/settings.toml")
     valid_backends = ["tk", "qt"]
     if settings["backend"] in valid_backends:
         if settings["backend"] == "tk":
@@ -209,7 +219,7 @@ def main():
                     log(f"The pack \"{name}\" does not exist!", "printerror")
                 else:
                     os.chdir(pack_root)
-                    pack_toml = toml.load("pack.toml")
+                    pack_toml = opentoml(f"{pack_root}/pack.toml")
                     pack_edit = [
                                 [sg.Text("Source:"), sg.Combo(["modrinth", "curseforge"], key="source")],
                                 [sg.Text("Mod: "), sg.InputText(key="mod")],
@@ -316,8 +326,7 @@ def main():
                             pack_toml["author"] = pack_edit_values["author"]
                             pack_toml["version"] = pack_edit_values["version"]
                             pack_toml["versions"]["minecraft"] = pack_edit_values["minecraftversion"]
-                            with open("pack.toml", "w", encoding="utf8") as pack_toml_file:
-                                toml.dump(pack_toml, pack_toml_file)
+                            dumptoml(f"{pack_root}/pack.toml", pack_toml)
                             packwiz_refresh = os.system(f"{packwiz} refresh")
                             if usegit:
                                 os.system("git add .")
@@ -353,7 +362,7 @@ def main():
                 if modify_settings_values["backend"] in valid_backends and modify_settings_values["theme"] in sg.theme_list():
                     settings["backend"] = modify_settings_values["backend"]
                     settings[f"{current_backend}theme"] = modify_settings_values["theme"]
-                    dumpsettings(f"{root}/settings.toml", settings)
+                    dumptoml(f"{root}/settings.toml", settings)
                     log("Restart to see effect.", "printsg")
                 else:
                     log("Invalid settings!", "printerror")
