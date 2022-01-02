@@ -1,4 +1,5 @@
 altgraph==0.17.2
+cx-Freeze==6.9
 importlib-metadata==4.10.0
 pyinstaller==4.7
 pyinstaller-hooks-contrib==2021.4
