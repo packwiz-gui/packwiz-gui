@@ -55,8 +55,9 @@ def main():
                 print("Successfully reset settings.")
                 sys.exit()
             else:
-                print("settings.toml does not exist! Run normally to create.")
-                sys.exit()
+                print("--reset-settings is unnecessary, you don't have a settings.toml file.")
+                #print("settings.toml does not exist! Run normally to create.")
+                #sys.exit()
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
     logging_handlers = [logging_file_handler, logging_stdout_handler]
