@@ -15,7 +15,7 @@ def opentoml(f):
         return tomli.load(toml_file)
 
 def recreatesettings(f):
-    settings = """backend = \"tk\" # Default: tk
+    settings = """backend = \"qt\" # Default: qt
 tktheme = \"DarkGrey9\" # Default: DarkGrey9
 qttheme = \"SystemDefaultForReal\" # Default: SystemDefaultForReal
 usegit = false # Default: false
