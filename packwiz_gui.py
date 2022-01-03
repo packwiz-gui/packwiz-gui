@@ -1,5 +1,10 @@
 #!/bin/env python3
 
+"""
+packwiz-gui. If you don't know what this is, what are you doing here?
+Anyway, docstring to make linter stfu :)
+"""
+
 import os
 import platform
 import sys
