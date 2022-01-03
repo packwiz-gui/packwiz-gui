@@ -15,8 +15,8 @@ def runcmd(cmd):
         return os.system(cmd)
     elif type(cmd) is list:
         runcmdarr = []
-        for all in cmd:
-            runcmdarr.append(os.system(cmd))
+        for e in cmd:
+            runcmdarr.append(os.system(e))
         return runcmdarr
 
 def opentoml(f):
