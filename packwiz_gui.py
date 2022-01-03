@@ -22,7 +22,7 @@ def runcmd(cmd):
     """
     if isinstance(cmd, str):
         return os.system(cmd)
-    elif isinstance(cmd, list):
+    if isinstance(cmd, list):
         runcmdarr = []
         for stuff in cmd:
             runcmdarr.append(os.system(stuff))
