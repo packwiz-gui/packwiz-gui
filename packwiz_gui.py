@@ -14,7 +14,6 @@ import webbrowser
 import shutil
 import tomli
 import tomli_w
-import re
 
 def runcmd(cmd):
     """
