@@ -11,32 +11,55 @@ import tomli
 import tomli_w
 
 def runcmd(cmd):
-    if type(cmd) is str:
+    """
+    Run command. Get exit code as return. Simple enough.
+    Throw in as array to run them all, get back an array of exit codes.
+    """
+    if isinstance(cmd, str):
         return os.system(cmd)
-    elif type(cmd) is list:
+    elif isinstance(cmd, list):
         runcmdarr = []
-        for e in cmd:
-            runcmdarr.append(os.system(e))
+        for stuff in cmd:
+            runcmdarr.append(os.system(stuff))
         return runcmdarr
 
-def opentoml(f):
-    with open(f, "rb") as toml_file:
+def opentoml(filename):
+    """
+    Open toml file. Returns dict.
+    Args:
+    filename; filename of file (with path) to open
+    """
+    with open(filename, "rb") as toml_file:
         return tomli.load(toml_file)
 
-def recreatesettings(f):
+def dumptoml(filename, var):
+    """
+    Takes in dict and filename. Dumps dict to file as toml.
+    Args:
+    filename; filename of file (with path) to dump to
+    var; dict to dump from
+    """
+    with open(filename, "wb") as toml_file:
+        tomli_w.dump(var, toml_file)
+
+def recreatesettings(filename):
+    """
+    Recreate settings.
+    Args:
+    filename; filename of settings toml file.
+    """
     settings = """backend = \"qt\"
 tktheme = \"DarkGrey9\"
 qttheme = \"SystemDefaultForReal\"
 usegit = false
 """
-    with open(f, "w") as settings_file:
+    with open(filename, "w", encoding="UTF-8") as settings_file:
         settings_file.write(settings)
 
-def dumptoml(f, v):
-    with open(f, "wb") as toml_file:
-        tomli_w.dump(v, toml_file)
-
 def main():
+    """
+    Main function. Mostly using this docstring to make linter stfu
+    """
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hd", ["help", "debug", "reset-settings"])
     except getopt.GetoptError:
@@ -180,7 +203,7 @@ def main():
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
                     pack_create_command = runcmd(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                    with open(".packwizignore", "w", encoding="utf8") as pwignore:
+                    with open(".packwizignore", "w", encoding="UTF-8") as pwignore:
                         pwignore.write("*.zip\n.git/**")
                     os.mkdir("mods")
                     if usegit:
