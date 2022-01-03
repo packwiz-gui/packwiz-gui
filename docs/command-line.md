@@ -6,4 +6,4 @@ Not really sure what to write here, so...
 
 - `-h`, `--help`: A help message.
 - `-d`, `--debug`: Verbose logging.
--     `--reset-settings`: Reset the settings file. Permanent.
+- `--reset-settings`: Reset the settings file. Permanent.
