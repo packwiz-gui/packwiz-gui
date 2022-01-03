@@ -17,11 +17,11 @@ try:
         raise getopt.GetoptError("")
 except getopt.GetoptError:
     print("Usage:")
-    print("      --deps:             Install (python-only) deps")
-    print("      --deps-nobuild:     Install (non-build related, python-only) deps")
-    print("      --pyinstaller:      Compile with pyinstaller")
-    print("      --cxfreeze:         Compile with cx_freeze")
-    print("  -r, --remove:           Cleanup build directories")
+    print("      --deps:             Install all non-compiling related dependencies (dependencies required to run the script).")
+    print("      --deps-nobuild:     Install required dependencies to start compiling or running the script.")
+    print("      --pyinstaller:      Compile with pyinstaller. Stores in pyinstaller directory.")
+    print("      --cxfreeze:         Compile with cx_freeze. Stores in cxfreeze firectory.")
+    print("  -r, --remove:           Cleans up build directories")
     sys.exit()
 
 if os.path.isdir(sys.path[0]):
