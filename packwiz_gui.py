@@ -14,6 +14,7 @@ import webbrowser
 import shutil
 import tomli
 import tomli_w
+import re
 
 def runcmd(cmd):
     """
@@ -196,7 +197,10 @@ def main():
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
                 name = pack_create_values["name"]
-                pack_root = f"{root}/instances/{name}"
+                #name_escaped = name.replace("\"", "_")
+                invalid_char_list = ["*", "\\", "/", "(", ")", "\""]
+                name_escaped = name.replace("*", "_").replace("\\", "_").replace("/", "_").replace("(", "_").replace(")", "_").replace(")", "_").replace("\"", "_")
+                pack_root = f"{root}/instances/{name_escaped}"
                 if os.path.isdir(pack_root):
                     log(f"The pack \"{name}\" already exists!", "printerror")
                 else:
