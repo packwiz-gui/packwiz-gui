@@ -15,11 +15,3 @@
 2. Download the compiled binary (choose between `pyinstaller` or `cxfreeze`) from github actions or github releases.
 
 3. Run it from the command line/terminal (NEVER double click).
-
-# Known Bugs
-
-(read: [bugs](./bugs.md)) for a list of known bugs that are difficult or impossible to fix by us, and workarounds for some of them.
-
-# Windows
-
-Read [windows](./windows.md) for more information
