@@ -22,4 +22,4 @@
 
 # Windows
 
-If you use windows, then sorry about the fact that we can't test on windows, but (read: [windows](./windows.md)) anyway.
+Read [windows](./windows.md) for more information
