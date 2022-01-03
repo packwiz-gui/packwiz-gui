@@ -100,18 +100,10 @@ def main():
     valid_backends = ["tk", "qt"]
     if settings["backend"] in valid_backends:
         if settings["backend"] == "qt":
-            try:
-                import PySimpleGUIQt as sg
-            except ModuleNotFoundError:
-                print("You must install PySimpleGUIQt!")
-                sys.exit()
+            import PySimpleGUIQt as sg
             sg.theme(settings["qttheme"])
         elif settings["backend"] == "tk":
-            try:
-                import PySimpleGUI as sg
-            except ModuleNotFoundError:
-                print("You must install PySimpleGUI!")
-                sys.exit()
+            import PySimpleGUI as sg
             sg.theme(settings["tktheme"])
         current_backend = settings["backend"]
     else:
