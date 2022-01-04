@@ -313,8 +313,6 @@ def main():
                                 log(f"error code {pack_export_command}", "debug")
                             else:
                                 log(f"Pack \"{name}\" successfully exported.", "printsg")
-                                if usegit:
-                                    runcmd(["git add .", f"git commit -m \"Export pack {name}\""])
                                 if platform.system() == "Windows":
                                     os.startfile(pack_root)
                                 elif platform.system() == "Darwin":
@@ -328,8 +326,6 @@ def main():
                                 log(f"error code {pack_export_command}", "debug")
                             else:
                                 log(f"Pack \"{name}\" successfully exported.", "printsg")
-                                if usegit:
-                                    runcmd(["git add .", f"git commit -m \"Export pack {name}\""])
                                 if platform.system() == "Windows":
                                     os.startfile(pack_root)
                                 elif platform.system() == "Darwin":
