@@ -24,6 +24,9 @@ except getopt.GetoptError:
     print("  -r, --remove:           Cleans up build directories")
     sys.exit()
 
+if len(opts) > 1:
+    raise getopt.GetoptError("Cannot have more than 1 option.")
+
 if os.path.isdir(sys.path[0]):
     root = sys.path[0]
 else:

@@ -1,63 +1,30 @@
 name: build
 on: [push, pull_request]
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - name: Setup python
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install dependencies, compile pyinstaller, compile cxfreeze
-        run: python3 build.py --deps --pyinstaller --cxfreeze
+      - name: Install dependencies
+        run: python3 build.py --deps
+      - name: Compile pyinstaller
+        run:  python3 build.py --pyinstaller
+      - name: Compile cxfreeze
+        run: python3 build.py --cxfreeze
       - name: Upload pyinstaller
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: packwiz_gui_linux_pyinstaller
+          name: packwiz_gui_${{ runner.os }}_pyinstaller
           path: pyinstaller/dist
       - name: Upload cxfreeze
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: packwiz_gui_linux_cxfreeze
-          path: cxfreeze/build
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install dependencies, compile pyinstaller, compile cxfreeze
-        run: python3 build.py --deps --pyinstaller --cxfreeze
-      - name: Upload pyinstaller
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: packwiz_gui_windows_pyinstaller
-          path: pyinstaller/dist
-      - name: Upload cxfreeze
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: packwiz_gui_windows_cxfreeze
-          path: cxfreeze/build
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install dependencies, compile pyinstaller, compile cxfreeze
-        run: python3 build.py --deps --pyinstaller --cxfreeze
-      - name: Upload pyinstaller
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: packwiz_gui_macos_pyinstaller
-          path: pyinstaller/dist
-      - name: Upload cxfreeze
-        uses: actions/upload-artifact@v2.2.4
-        with:
-          name: packwiz_gui_macos_cxfreeze
+          name: packwiz_gui_${{ runner.os }}_cxfreeze
           path: cxfreeze/build
