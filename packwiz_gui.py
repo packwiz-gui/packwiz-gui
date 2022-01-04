@@ -212,7 +212,7 @@ def main():
                     os.chdir(pack_root)
                     pack_create_command = runcmd(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
                     with open(".packwizignore", "w", encoding="UTF-8") as pwignore:
-                        pwignore.write("*.zip\n.git/**")
+                        pwignore.write("*.zip\n*.mrpack\n.git/**")
                     os.mkdir("mods")
                     if usegit:
                         runcmd(["git init", "git add .", f"git commit -m \"Create pack {name}\""])
@@ -257,7 +257,8 @@ def main():
                                 [sg.B("Add Mod")],
                                 [sg.B("Remove Mod")],
                                 [sg.B("View Installed Mods")],
-                                [sg.B("Export to CF pack")],
+                                [sg.B("Export to Modrinth pack")],
+                                [sg.B("Export to Curseforge pack")],
                                 [sg.B("Refresh pack")],
                                 [sg.B("Update all mods")],
                                 [sg.B("Update mod")],
@@ -305,15 +306,26 @@ def main():
                             for mod in os.listdir(f"{pack_root}/mods"):
                                 mods_list = mods_list + mod[::-1].replace("lmot.", "", 1)[::-1] + "\n"
                             sg.popup(mods_list, title="Installed mods")
-                        if pack_edit_event == "Export to CF pack":
+                        if pack_edit_event == "Export to Curseforge pack":
                             pack_export_command = runcmd(f"{packwiz} cf export")
                             if pack_export_command != 0:
                                 log(f"There was an error exporting the pack \"{name}\"!", "printerror")
                                 log(f"error code {pack_export_command}", "debug")
                             else:
                                 log(f"Pack \"{name}\" successfully exported.", "printsg")
-                                if usegit:
-                                    runcmd(["git add .", f"git commit -m \"Export pack {name}\""])
+                                if platform.system() == "Windows":
+                                    os.startfile(pack_root)
+                                elif platform.system() == "Darwin":
+                                    runcmd(f"open {pack_root}")
+                                else:
+                                    runcmd(f"xdg-open {pack_root}")
+                        if pack_edit_event == "Export to Modrinth pack":
+                            pack_export_command = runcmd(f"{packwiz} mr export")
+                            if pack_export_command != 0:
+                                log(f"There was an error exporting the pack \"{name}\"!", "printerror")
+                                log(f"error code {pack_export_command}", "debug")
+                            else:
+                                log(f"Pack \"{name}\" successfully exported.", "printsg")
                                 if platform.system() == "Windows":
                                     os.startfile(pack_root)
                                 elif platform.system() == "Darwin":
