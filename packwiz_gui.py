@@ -220,8 +220,12 @@ def main():
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
                     pack_create_command = oldruncmd(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                    with open(".packwizignore", "w", encoding="UTF-8") as pwignore:
-                        pwignore.write("*.zip\n*.mrpack\n.git/**")
+                    with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
+                        pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore")
+                    with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
+                        gitattrib.write("* -text")
+                    with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
+                        gitignore.write("*.zip\n*.mrpack")
                     os.mkdir("mods")
                     if usegit:
                         runcmd(["git", "init"])
