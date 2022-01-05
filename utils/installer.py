@@ -31,6 +31,9 @@ ip_addr = getPublicIp()
 
 
 
+SHELL = None
+INSTANCES_DIR = f'{os.getcwd()}/../instances/'
+ROOT = os.getcwd()
 
 if system() == 'Windows':
     PLATFORM = 'Win'
@@ -59,20 +62,20 @@ if fabric_installer_version is None:
     fabric_installer_version = '0.10.2'
 
 pack_name = input("Pack name: ")
-if pack_name is None:
+if pack_name == "":
     print('ERROR: Please specify a pack name')
     pack_name = input('Pack name: ')
     
 minecraft_version = input("Minecraft version [1.18.1]: ")
-if minecraft_version is None:
+if minecraft_version == "":
     minecraft_version = '1.18.1'
 
 fabric_loader_version = input("Fabric loader version [0.12.12]: ")
-if fabric_loader_version is None: 
+if fabric_loader_version == "": 
     fabric_loader_version = '0.10.2'
 
 system_ram = input('RAM to allocate to the minecraft server in MBs [4096]: ')
-if system_ram is None:
+if system_ram == "":
     system_ram = 4096
 
 
