@@ -1,7 +1,6 @@
 import sys
 import wget
 import os
-from sys import exit
 from platform import system
 
 """
@@ -10,18 +9,16 @@ Fabric packwiz server installer pack for packwiz-gui
 
 # Just a bunch of setup stuff
 
-PLATFORM = ''
-SHELL = ''
-UNIXTYPE = ''
+PLATFORM = None
+SHELL = None
+UNIXTYPE = None
 INSTANCES_DIR = f'{os.getcwd()}/../instances/'
 ROOT = os.getcwd()
-fabric_installer_version = ''
-fabric_loader_version = '0.10.2'
-pack_name = ''
-minecraft_version = ''
-prompt_return_code = '='
-system_ram = ''
-HHHH = 1
+fabric_installer_version = None
+fabric_loader_version = None
+pack_name = None
+minecraft_version = None
+system_ram = None
 
 if system() == 'Windows':
     PLATFORM = 'Win'
