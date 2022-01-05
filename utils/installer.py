@@ -40,24 +40,24 @@ print("#######################################")
 print("The below prompt will ask you some questions for the setup of the server. The value in [] is the recommended value, if you hit enter without specifying a version it will pass the recommended value.")
 
 fabric_installer_version = input("Fabric installer version (NOT fabric loader) [0.10.2]: ")
-if fabric_installer_version == '': 
+if fabric_installer_version is None: 
     fabric_installer_version = '0.10.2'
 
 pack_name = input("Pack name: ")
-if pack_name == '':
+if pack_name is None:
     print('ERROR: Please specify a pack name')
     pack_name = input('Pack name: ')
     
 minecraft_version = input("Minecraft version [1.18.1]: ")
-if minecraft_version == '':
+if minecraft_version is None:
     minecraft_version = '1.18.1'
 
 fabric_loader_version = input("Fabric loader version [0.12.12]: ")
-if fabric_loader_version == '': 
+if fabric_loader_version is None: 
     fabric_loader_version = '0.10.2'
 
 system_ram = input('RAM to allocate to the minecraft server in MBs [4096]: ')
-if system_ram == '':
+if system_ram is None:
     system_ram = 4096
 
 print('Date provided:')
