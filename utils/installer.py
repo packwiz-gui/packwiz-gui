@@ -5,7 +5,7 @@ from sys import exit
 from platform import system
 
 """
-Fabric packwiz server installer pack installer for packwiz-gui
+Fabric packwiz server installer pack for packwiz-gui
 """
 
 # Just a bunch of setup stuff
