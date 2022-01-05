@@ -40,7 +40,8 @@ system_ram = None
 if os.path.isfile(f"{ROOT}/settings.toml"): 
     settings = opentoml(f"{ROOT}/settings.toml")
 else:
-    print("packwiz-gui must be run once before this installer")
+    print("packwiz-gui must be run at least once before this installer")
+    sys.exit()
 ip_addr = getPublicIp()
 SHELL = None
 INSTANCES_DIR = f'{os.getcwd()}/../instances/'
