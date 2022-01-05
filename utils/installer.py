@@ -87,8 +87,8 @@ java -jar packwiz-installer.bootstrap.jar file://{os.getcwd}/../pack.toml
 java -Xmx{system_ram} -jar fabric-server-launch.jar
 """
 if PLATFORM == 'Windows':
-    f = open("start.bat", "a")
-    f.write(startshfile)
-if PLATFORM == 'Unix':
-    f = open("start.sh", "a")
-    f.write(startshfile)
+    with open("start.bat", "a", encoding="UTF-8") as f:
+        f.write(startshfile)
+elif PLATFORM == 'Unix':
+    with open("start.sh", "a", encoding="UTF-8") as f:
+        f.write(startshfile)
