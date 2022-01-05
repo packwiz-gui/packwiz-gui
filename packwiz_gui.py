@@ -8,6 +8,7 @@ Anyway, docstring to make linter stfu :)
 import os
 import platform
 import sys
+import subprocess
 import logging
 import getopt
 import webbrowser
@@ -15,11 +16,19 @@ import shutil
 import tomli
 import tomli_w
 
-def runcmd(cmd):
+def runcmd(cmd, shell=False, check=False):
     """
+    Run command.
+    """
+    return subprocess.run(cmd, shell=shell, check=check)
+
+def oldruncmd(cmd):
+    """
+    DEPRECATED!!!
     Run command. Get exit code as return. Simple enough.
     Throw in as array to run them all, get back an array of exit codes.
     """
+    print("Warning! deprecated function used.")
     if isinstance(cmd, str):
         return os.system(cmd)
     if isinstance(cmd, list):
@@ -47,19 +56,19 @@ def dumptoml(filename, var):
     with open(filename, "wb") as toml_file:
         tomli_w.dump(var, toml_file)
 
-def recreatesettings(filename):
+def createsettings(filename):
     """
-    Recreate settings.
+    Create settings.
     Args:
     filename; filename of settings toml file.
     """
-    settings = """backend = \"qt\"
-tktheme = \"DarkGrey9\"
-qttheme = \"SystemDefaultForReal\"
-usegit = false
-"""
-    with open(filename, "w", encoding="UTF-8") as settings_file:
-        settings_file.write(settings)
+    settings = {
+                "backend": "qt",
+                "tktheme": "DarkGrey9",
+                "qttheme": "SystemDefaultForReal",
+                "usegit": False
+                }
+    dumptoml(filename, settings)
 
 def main():
     """
@@ -69,7 +78,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[1:], "hd", ["help", "debug", "reset-settings"])
     except getopt.GetoptError:
         print("Error: Unknown flag.\nUse --help to see available commands.")
-        sys.exit()
+        sys.exit(1)
     loglevel = 15
     if os.path.isdir(sys.path[0]):
         root = sys.path[0]
@@ -88,7 +97,7 @@ def main():
         elif opt == "--reset-settings":
             if os.path.isfile(f"{root}/settings.toml"):
                 os.remove(f"{root}/settings.toml")
-                recreatesettings(f"{root}/settings.toml")
+                createsettings(f"{root}/settings.toml")
                 print("Successfully reset settings.")
                 sys.exit()
             else:
@@ -132,7 +141,7 @@ def main():
             raise ValueError("Wrong or no type provided!")
 
     if not os.path.isfile(f"{root}/settings.toml"):
-        recreatesettings(f"{root}/settings.toml")
+        createsettings(f"{root}/settings.toml")
     settings = opentoml(f"{root}/settings.toml")
     valid_backends = ["tk", "qt"]
     if settings["backend"] in valid_backends:
@@ -151,7 +160,7 @@ def main():
         packwiz = f"{root}\\bin\\packwiz.exe"
     else:
         packwiz = f"{root}/bin/packwiz"
-        runcmd(f"chmod +x {packwiz}")
+        runcmd(["chmod", "+x", packwiz])
     if not os.path.isdir(f"{root}/instances"):
         os.mkdir(f"{root}/instances")
         log("No instances folder, creating...", "warning")
@@ -210,12 +219,18 @@ def main():
                     modloader_version = pack_create_values["modloaderversion"]
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
-                    pack_create_command = runcmd(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
-                    with open(".packwizignore", "w", encoding="UTF-8") as pwignore:
-                        pwignore.write("*.zip\n*.mrpack\n.git/**")
+                    pack_create_command = oldruncmd(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
+                    with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
+                        pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore")
+                    with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
+                        gitattrib.write("* -text")
+                    with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
+                        gitignore.write("*.zip\n*.mrpack")
                     os.mkdir("mods")
                     if usegit:
-                        runcmd(["git init", "git add .", f"git commit -m \"Create pack {name}\""])
+                        runcmd(["git", "init"])
+                        runcmd(["git", "add", "."])
+                        runcmd(["git", "commit", "-m", f"\"Create pack {name}\""])
                     os.chdir(root)
                     if pack_create_command != 0:
                         log(f"There was an error creating the pack \"{name}\"!", "printerror")
@@ -283,31 +298,33 @@ def main():
                             break
                         if pack_edit_event == "Add Mod":
                             os.chdir(pack_root)
-                            mod_add_command = runcmd(f"{packwiz} {source} install {mod}")
+                            mod_add_command = oldruncmd(f"{packwiz} {source} install {mod}")
                             if mod_add_command != 0:
                                 log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "printerror")
                                 log(f"error code {mod_add_command}", "debug")
                             else:
                                 log(f"Successfully added mod \"{mod}\" from source \"{source}\".", "printsg")
                                 if usegit:
-                                    runcmd(["git add .", f"git commit -m \"Add {mod}\""])
+                                    runcmd(["git", "add", "."])
+                                    runcmd(["git", "commit", "-m", f"\"Add {mod}\""])
                         if pack_edit_event == "Remove Mod":
                             os.chdir(f"{pack_root}")
-                            mod_remove_command = runcmd(f"{packwiz} remove {mod}")
+                            mod_remove_command = oldruncmd(f"{packwiz} remove {mod}")
                             if mod_remove_command != 0:
                                 log(f"There was an error removing mod \"{mod}\"!", "printerror")
                                 log(f"error code {mod_remove_command}", "debug")
                             else:
                                 log(f"Mod \"{mod}\" successfully removed.", "printsg")
                                 if usegit:
-                                    runcmd(["git add .", f"git commit -m \"Remove {mod}\""])
+                                    runcmd(["git", "add", "."])
+                                    runcmd(["git", "commit", "-m", f"\"Remove {mod}\""])
                         if pack_edit_event == "View Installed Mods":
                             mods_list = ""
                             for mod in os.listdir(f"{pack_root}/mods"):
                                 mods_list = mods_list + mod[::-1].replace("lmot.", "", 1)[::-1] + "\n"
                             sg.popup(mods_list, title="Installed mods")
                         if pack_edit_event == "Export to Curseforge pack":
-                            pack_export_command = runcmd(f"{packwiz} cf export")
+                            pack_export_command = oldruncmd(f"{packwiz} cf export")
                             if pack_export_command != 0:
                                 log(f"There was an error exporting the pack \"{name}\"!", "printerror")
                                 log(f"error code {pack_export_command}", "debug")
@@ -316,11 +333,11 @@ def main():
                                 if platform.system() == "Windows":
                                     os.startfile(pack_root)
                                 elif platform.system() == "Darwin":
-                                    runcmd(f"open {pack_root}")
+                                    runcmd(["open", pack_root])
                                 else:
-                                    runcmd(f"xdg-open {pack_root}")
+                                    runcmd(["xdg-open", pack_root])
                         if pack_edit_event == "Export to Modrinth pack":
-                            pack_export_command = runcmd(f"{packwiz} mr export")
+                            pack_export_command = oldruncmd(f"{packwiz} mr export")
                             if pack_export_command != 0:
                                 log(f"There was an error exporting the pack \"{name}\"!", "printerror")
                                 log(f"error code {pack_export_command}", "debug")
@@ -329,43 +346,47 @@ def main():
                                 if platform.system() == "Windows":
                                     os.startfile(pack_root)
                                 elif platform.system() == "Darwin":
-                                    runcmd(f"open {pack_root}")
+                                    runcmd(["open", pack_root])
                                 else:
-                                    runcmd(f"xdg-open {pack_root}")
+                                    runcmd(["xdg-open", pack_root])
                         if pack_edit_event == "Refresh pack":
-                            packwiz_refresh = runcmd(f"{packwiz} refresh")
+                            packwiz_refresh = oldruncmd(f"{packwiz} refresh")
                             if packwiz_refresh != 0:
                                 log("There was an error refreshing the pack!", "printerror")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
                                 log("Successfully refreshed pack.", "printsg")
                             if usegit:
-                                runcmd(["git add .", f"git commit -m \"Refresh pack {name}\""])
+                                runcmd(["git", "add", "."])
+                                runcmd(["git", "commit", "-m", f"\"Refresh pack {name}\""])
                         if pack_edit_event == "Update all mods":
-                            packwiz_update_all = runcmd(f"{packwiz} update -a")
+                            packwiz_update_all = oldruncmd(f"{packwiz} update -a")
                             if packwiz_update_all != 0:
                                 log("There was an error updating all mods!", "printerror")
                             else:
                                 log("Updating all mods succeeded.", "printsg")
                             if usegit:
-                                runcmd(["git add .", "git commit -m \"Update all mods\""])
+                                runcmd(["git", "add", "."])
+                                runcmd(["git", "commit", "-m", "\"Update all mods\""])
                         if pack_edit_event == "Update mod":
-                            packwiz_update_mod = runcmd(f"{packwiz} update {mod}")
+                            packwiz_update_mod = oldruncmd(f"{packwiz} update {mod}")
                             if packwiz_update_mod != 0:
                                 log("There was an error updating your mod(s)!", "printerror")
                             else:
                                 log("Updating your mod(s) succeeded.", "printsg")
                             if usegit:
-                                runcmd(["git add .", f"git commit -m \"Update {mod}\""])
+                                runcmd(["git", "add", "."])
+                                runcmd(["git", "commit", "-m", f"\"Update {mod}\""])
                         if pack_edit_event == "Change":
                             pack_toml["name"] = pack_edit_values["name"]
                             pack_toml["author"] = pack_edit_values["author"]
                             pack_toml["version"] = pack_edit_values["version"]
                             pack_toml["versions"]["minecraft"] = pack_edit_values["minecraftversion"]
                             dumptoml(f"{pack_root}/pack.toml", pack_toml)
-                            packwiz_refresh = runcmd(f"{packwiz} refresh")
+                            packwiz_refresh = oldruncmd(f"{packwiz} refresh")
                             if usegit:
-                                runcmd(["git add .", "git commit -m \"Modify pack details\""])
+                                runcmd(["git", "add", "."])
+                                runcmd(["git", "commit", "-m", "\"Modify pack details\""])
                             if packwiz_refresh != 0:
                                 log("There was an error changing the pack details!", "printerror")
                                 log(f"error code {packwiz_refresh}", "debug")
@@ -389,14 +410,22 @@ def main():
                               [sg.T("Backend:"), sg.Drop(["tk", "qt"], key="backend", default_value=current_backend)],
                               [sg.Drop(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
                               [sg.CB("Use git", key="git", default=settings["usegit"])],
+                              [sg.B("Reset settings")],
                               [sg.B("Ok")]
                               ]
             main_menu_window.hide()
             modify_settings_window = sg.Window("Modify settings", modify_settings)
             modify_settings_event, modify_settings_values = modify_settings_window.read()
-            if modify_settings_event == "Ok":
+            if modify_settings_event == "Reset settings":
+                if os.path.isfile(f"{root}/settings.toml"):
+                    os.remove(f"{root}/settings.toml")
+                createsettings(f"{root}/settings.toml")
+                log("Successfully reset settings.", "printsg")
+                sys.exit()
+            elif modify_settings_event == "Ok":
                 if modify_settings_values["backend"] in valid_backends and modify_settings_values["theme"] in sg.theme_list():
                     settings["usegit"] = modify_settings_values["git"]
+                    usegit = modify_settings_values["git"]
                     dumptoml(f"{root}/settings.toml", settings)
                     if modify_settings_values["backend"] != settings["backend"] or modify_settings_values["theme"] != settings[f"{current_backend}theme"]:
                         settings["backend"] = modify_settings_values["backend"]
