@@ -1,34 +1,49 @@
 import sys
 import wget
 import os
+import socket
+import re
 from platform import system
+from urllib.request import urlopen
 
 """
 Fabric packwiz server installer pack for packwiz-gui
 """
 
-# Just a bunch of setup stuff
+def getPublicIp():
+    data = str(urlopen('http://checkip.dyndns.com/').read())
 
+    return re.compile(r'Address: (\d+\.\d+\.\d+\.\d+)').search(data).group(1)
+
+# Just a bunch of setup stuff
 PLATFORM = None
 SHELL = None
 UNIXTYPE = None
-INSTANCES_DIR = f'{os.getcwd()}/../instances/'
 ROOT = os.getcwd()
+PACKWIZ_BINARY = None
+INSTANCES_DIR = f'{ROOT}/../instances/'
 fabric_installer_version = None
 fabric_loader_version = None
 pack_name = None
 minecraft_version = None
 system_ram = None
+ip_addr = getPublicIp()
+
+
+
 
 if system() == 'Windows':
     PLATFORM = 'Win'
     UNIXTYPE = 'Non-unix'
+    PACKWIZ_BINARY = f'{ROOT}/bin/packwiz.exe'
 elif system() == 'Linux':
     PLATFORM = 'Unix'
     UNIXTYPE = 'Linux'
+    PACKWIZ_BINARY = f'{ROOT}/bin/packwiz'
 elif system() == 'Darwin':
     PLATFORM = 'Unix'
     UNIXTYPE = 'macOS'
+    PACKWIZ_BINARY = f'{ROOT}/bin/packwiz'
 
 if PLATFORM == 'Win':
     os.system('title Fabric + packwiz installer script')
@@ -60,7 +75,9 @@ system_ram = input('RAM to allocate to the minecraft server in MBs [4096]: ')
 if system_ram is None:
     system_ram = 4096
 
-print('Date provided:')
+
+
+print('Data provided:')
 print(f'Fabric installer version: {fabric_installer_version}')
 print(f'Pack name: {pack_name}')
 print(f'Minecraft version: {minecraft_version}')
@@ -74,16 +91,19 @@ print(f'Fabric loader version: {fabric_loader_version}')
 #        exit()
 #    else:
 #        prompt()
-server_root = f'{INSTANCES_DIR}/{pack_name}/server/'
+pack_root = f'{INSTANCES_DIR}/{pack_name}'
+server_root = f'{pack_root}/server/'
 if not os.path.exists(f'{server_root}'):
     os.makedirs(f'{server_root}')
-os.chdir(f'{server_root}')
+os.chdir(pack_root)
+os.system(f'{PACKWIZ_BINARY} serve')
+os.chdir(server_root)
 wget.download(f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar", 'fabric-installer.jar')
 wget.download(f'https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar')
 wget.download(f'https://github.com/packwiz/packwiz-installer/releases/download/v0.3.2/packwiz-installer.jar')
 os.system(f'java -jar installer.jar server -mcversion {minecraft_version} -downloadMinecraft')
 startshfile = f"""
-java -jar packwiz-installer.bootstrap.jar file://{server_root}/../pack.toml
+java -jar packwiz-installer.bootstrap.jar http://{ip_addr}:8080/pack.toml
 java -Xmx{system_ram} -jar fabric-server-launch.jar
 """
 if PLATFORM == 'Windows':
