@@ -83,7 +83,7 @@ wget.download(f'https://github.com/packwiz/packwiz-installer-bootstrap/releases/
 wget.download(f'https://github.com/packwiz/packwiz-installer/releases/download/v0.3.2/packwiz-installer.jar')
 os.system(f'java -jar installer.jar server -mcversion {minecraft_version} -downloadMinecraft')
 startshfile = f"""
-java -jar packwiz-installer.bootstrap.jar file://{os.getcwd}/../pack.toml
+java -jar packwiz-installer.bootstrap.jar file://{server_root}/../pack.toml
 java -Xmx{system_ram} -jar fabric-server-launch.jar
 """
 if PLATFORM == 'Windows':
