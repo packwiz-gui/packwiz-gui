@@ -13,11 +13,11 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: python3 build.py --deps
+        run: python3 ./utils/build.py --deps
       - name: Compile pyinstaller
-        run:  python3 build.py --pyinstaller
+        run:  python3 ./utils/build.py --pyinstaller
       - name: Compile cxfreeze
-        run: python3 build.py --cxfreeze
+        run: python3 ./utils/build.py --cxfreeze
       - name: Upload pyinstaller
         uses: actions/upload-artifact@v2
         with:
