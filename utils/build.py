@@ -25,9 +25,9 @@ except getopt.GetoptError:
     sys.exit()
 
 if os.path.isdir(sys.path[0]):
-    root = sys.path[0]
+    root = f'{sys.path[0]}/..'
 else:
-    root = os.getcwd()
+    root = f'{os.getcwd()}/..'
 
 def compile(builder):
     if not os.path.isdir(f"{root}/{builder}"):
