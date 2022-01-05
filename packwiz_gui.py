@@ -66,7 +66,12 @@ def createsettings(filename):
                 "backend": "qt",
                 "tktheme": "DarkGrey9",
                 "qttheme": "SystemDefaultForReal",
-                "usegit": False
+                "usegit": False,
+                "defaultRAMAllocation": "4096",
+                "defaultPackTOMLURL": "http://127.0.0.1/pack.toml",
+                "defaultFabricInstaller": "0.10.2",
+                "defaultMinecraft": "1.18.1",
+                "defaultFabricLoader": "0.12.12"
                 }
     dumptoml(filename, settings)
 

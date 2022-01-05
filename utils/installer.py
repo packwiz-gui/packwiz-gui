@@ -5,10 +5,20 @@ import socket
 import re
 from platform import system
 from urllib.request import urlopen
+import tomli
+import tomli_w
 
 """
 Fabric packwiz server installer pack for packwiz-gui
 """
+def opentoml(filename):
+    """
+    Open toml file. Returns dict.
+    Args:
+    filename; filename of file (with path) to open
+    """
+    with open(filename, "rb") as toml_file:
+        return tomli.load(toml_file)
 
 def getPublicIp():
     data = str(urlopen('http://checkip.dyndns.com/').read())
@@ -27,10 +37,11 @@ fabric_loader_version = None
 pack_name = None
 minecraft_version = None
 system_ram = None
+if os.path.isfile(f"{ROOT}/settings.toml"): 
+    settings = opentoml(f"{ROOT}/settings.toml")
+else:
+    print("packwiz-gui must be run once before this installer")
 ip_addr = getPublicIp()
-
-
-
 SHELL = None
 INSTANCES_DIR = f'{os.getcwd()}/../instances/'
 ROOT = os.getcwd()
@@ -59,7 +70,7 @@ print("The below prompt will ask you some questions for the setup of the server.
 
 fabric_installer_version = input("Fabric installer version (NOT fabric loader) [0.10.2]: ")
 if fabric_installer_version is None: 
-    fabric_installer_version = '0.10.2'
+    fabric_installer_version = settings["defaultFabricInstaller"]
 
 pack_name = input("Pack name: ")
 if pack_name == "":
@@ -68,15 +79,15 @@ if pack_name == "":
     
 minecraft_version = input("Minecraft version [1.18.1]: ")
 if minecraft_version == "":
-    minecraft_version = '1.18.1'
+    minecraft_version = settings["defaultMinecraft"]
 
 fabric_loader_version = input("Fabric loader version [0.12.12]: ")
 if fabric_loader_version == "": 
-    fabric_loader_version = '0.10.2'
+    fabric_loader_version = settings["defaultFabricLoader"]
 
 system_ram = input('RAM to allocate to the minecraft server in MBs [4096]: ')
 if system_ram == "":
-    system_ram = 4096
+    system_ram = settings["defaultRAMAllocation"]
 
 
 
