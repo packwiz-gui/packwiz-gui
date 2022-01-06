@@ -70,6 +70,8 @@ def createsettings(filename):
                 }
     dumptoml(filename, settings)
 
+version_number = '1.1.0'
+
 def main():
     """
     Main function. Mostly using this docstring to make linter stfu
@@ -183,7 +185,8 @@ def main():
                 [sg.T("")],
                 [sg.B("Settings")],
                 [sg.T("")],
-                [sg.B("Close packwiz-gui")]
+                [sg.B("Close packwiz-gui")],
+                [sg.T(f"packwiz-gui v{version_number}", font=(sg.DEFAULT_FONT, 8, "italic"))]
                 ]
     main_menu_window = sg.Window("Main Menu", main_menu)
     while True:
