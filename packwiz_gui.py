@@ -175,6 +175,8 @@ def main():
                 [sg.T("")],
                 [sg.B("Create a new pack")],
                 [sg.T("")],
+                [sg.B("Import an existing pack")],
+                [sg.T("")],
                 [sg.B("Modify pack")],
                 [sg.T("")],
                 [sg.B("Download packwiz")],
@@ -240,7 +242,27 @@ def main():
                         log(f"Pack \"{name}\" created.", "printsg")
             pack_create_window.close()
             main_menu_window.UnHide()
-
+        if main_menu_event == "Import an existing pack":
+            pack_import = [
+                          [sg.T("Pack name:"), sg.In()],
+                          [sg.In(), sg.FileBrowse(file_types=(('Curseforge packs', '*.zip'),))],
+                          [sg.B("Import"), sg.B("Cancel")],
+                          ]
+            main_menu_window.hide()
+            pack_import_window = sg.Window("Import pack", pack_import)
+            pack_import_event, pack_import_values = pack_import_window.read()
+            if pack_import_event == "Import":
+                name = pack_import_values[0]
+                pack_root = f"{root}/instances/{name}"
+                os.mkdir(pack_root)
+                os.chdir(pack_root)
+                pack_import_command = runcmd([packwiz, "cf", "import", pack_import_values[1]])
+                if pack_import_command.returncode != 0:
+                    log(f"Error while importing pack {name}!", "errorsg")
+                else:
+                    log("Successfully imported pack.", "printsg")
+            pack_import_window.close()
+            main_menu_window.UnHide()
         if main_menu_event == "Modify pack":
             instances_list = ""
             for instance in os.listdir(f"{root}/instances"):
