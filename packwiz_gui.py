@@ -195,7 +195,7 @@ def main():
                         [sg.T("Author:"), sg.In(key="author")],
                         [sg.T("Pack Version:"), sg.In(key="version")],
                         [sg.T("Minecraft Version:"), sg.In(key="minecraftversion")],
-                        [sg.T("Modloader:"), sg.Drop(["forge", "fabric"], key="modloader")],
+                        [sg.T("Modloader:"), sg.Drop(["forge", "fabric", "liteloader"], key="modloader")],
                         [sg.T("Modloader Version:"), sg.In(key="modloaderversion")],
                         [sg.B("Create"), sg.B("Close")],
                         [sg.T("")],
