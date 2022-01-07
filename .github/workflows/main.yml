@@ -20,22 +20,21 @@ jobs:
         run:  python3 build.py --pyinstaller
       - name: Compile cxfreeze
         run: python3 build.py --cxfreeze
+      - name: Zip files for upload
+        run: |
+             tar -acvf ${{ runner.os }}_packwiz_gui_cxfreeze.zip cxfreeze/build
+             tar -acvf ${{ runner.os }}_packwiz_gui_pyinstaller.zip pyinstaller/dist
       - name: Upload pyinstaller
         uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}_packwiz_gui_pyinstaller
-          path: pyinstaller/dist
+          path: ${{ runner.os }}_packwiz_gui_pyinstaller.zip
       - name: Upload cxfreeze
         uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}_packwiz_gui_cxfreeze
-          path: cxfreeze/build
+          path: ${{ runner.os }}_packwiz_gui_cxfreeze.zip
 
-      - name: Zip files for upload
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-             tar -a -cf ${{ runner.os }}_packwiz_gui_cxfreeze.zip cxfreeze/build
-             tar -a -cf ${{ runner.os }}_packwiz_gui_pyinstaller.zip pyinstaller/dist
       - name: Upload to github actions
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
