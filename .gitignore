@@ -6,7 +6,8 @@ cxfreeze/
 # Files that are created by this.
 log.txt
 settings.toml
-# Misc files (cache, metadata).
+# Misc files/folders (cache, metadata).
 __pycache__/
 .DS_Store/
 .idea/
+*venv*/
