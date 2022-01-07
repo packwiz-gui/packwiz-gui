@@ -75,6 +75,8 @@ def createsettings(filename):
                 }
     dumptoml(filename, settings)
 
+version_number = '1.1.0'
+
 def main():
     """
     Main function. Mostly using this docstring to make linter stfu
@@ -180,13 +182,16 @@ def main():
                 [sg.T("")],
                 [sg.B("Create a new pack")],
                 [sg.T("")],
+                [sg.B("Import an existing pack")],
+                [sg.T("")],
                 [sg.B("Modify pack")],
                 [sg.T("")],
                 [sg.B("Download packwiz")],
                 [sg.T("")],
                 [sg.B("Settings")],
                 [sg.T("")],
-                [sg.B("Close packwiz-gui")]
+                [sg.B("Close packwiz-gui")],
+                [sg.T(f"packwiz-gui v{version_number}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
                 ]
     main_menu_window = sg.Window("Main Menu", main_menu)
     while True:
@@ -200,7 +205,7 @@ def main():
                         [sg.T("Author:"), sg.In(key="author")],
                         [sg.T("Pack Version:"), sg.In(key="version")],
                         [sg.T("Minecraft Version:"), sg.In(key="minecraftversion")],
-                        [sg.T("Modloader:"), sg.Drop(["forge", "fabric"], key="modloader")],
+                        [sg.T("Modloader:"), sg.Drop(["forge", "fabric", "liteloader"], key="modloader")],
                         [sg.T("Modloader Version:"), sg.In(key="modloaderversion")],
                         [sg.B("Create"), sg.B("Close")],
                         [sg.T("")],
@@ -224,7 +229,7 @@ def main():
                     modloader_version = pack_create_values["modloaderversion"]
                     os.mkdir(pack_root)
                     os.chdir(pack_root)
-                    pack_create_command = oldruncmd(f"{packwiz} init --name \"{name}\" --author \"{author}\" --version \"{pack_version}\" --mc-version \"{mc_version}\" --modloader \"{modloader}\" --{modloader}-version \"{modloader_version}\"")
+                    pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
                     with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
                         pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore")
                     with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
@@ -237,7 +242,7 @@ def main():
                         runcmd(["git", "add", "."])
                         runcmd(["git", "commit", "-m", f"\"Create pack {name}\""])
                     os.chdir(root)
-                    if pack_create_command != 0:
+                    if pack_create_command.returncode != 0:
                         log(f"There was an error creating the pack \"{name}\"!", "printerror")
                         log(f"error code {pack_create_command}", "debug")
                         shutil.rmtree(pack_root)
@@ -245,7 +250,27 @@ def main():
                         log(f"Pack \"{name}\" created.", "printsg")
             pack_create_window.close()
             main_menu_window.UnHide()
-
+        if main_menu_event == "Import an existing pack":
+            pack_import = [
+                          [sg.T("Pack name:"), sg.In()],
+                          [sg.In(), sg.FileBrowse(file_types=(('Curseforge packs', '*.zip'),))],
+                          [sg.B("Import"), sg.B("Cancel")],
+                          ]
+            main_menu_window.hide()
+            pack_import_window = sg.Window("Import pack", pack_import)
+            pack_import_event, pack_import_values = pack_import_window.read()
+            if pack_import_event == "Import":
+                name = pack_import_values[0]
+                pack_root = f"{root}/instances/{name}"
+                os.mkdir(pack_root)
+                os.chdir(pack_root)
+                pack_import_command = runcmd([packwiz, "cf", "import", pack_import_values[1]])
+                if pack_import_command.returncode != 0:
+                    log(f"Error while importing pack {name}!", "errorsg")
+                else:
+                    log("Successfully imported pack.", "printsg")
+            pack_import_window.close()
+            main_menu_window.UnHide()
         if main_menu_event == "Modify pack":
             instances_list = ""
             for instance in os.listdir(f"{root}/instances"):
@@ -303,8 +328,8 @@ def main():
                             break
                         if pack_edit_event == "Add Mod":
                             os.chdir(pack_root)
-                            mod_add_command = oldruncmd(f"{packwiz} {source} install {mod}")
-                            if mod_add_command != 0:
+                            mod_add_command = runcmd([packwiz, source, "install", mod])
+                            if mod_add_command.returncode != 0:
                                 log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "printerror")
                                 log(f"error code {mod_add_command}", "debug")
                             else:
@@ -314,8 +339,8 @@ def main():
                                     runcmd(["git", "commit", "-m", f"\"Add {mod}\""])
                         if pack_edit_event == "Remove Mod":
                             os.chdir(f"{pack_root}")
-                            mod_remove_command = oldruncmd(f"{packwiz} remove {mod}")
-                            if mod_remove_command != 0:
+                            mod_remove_command = runcmd([packwiz, "remove", mod])
+                            if mod_remove_command.returncode != 0:
                                 log(f"There was an error removing mod \"{mod}\"!", "printerror")
                                 log(f"error code {mod_remove_command}", "debug")
                             else:
@@ -329,8 +354,8 @@ def main():
                                 mods_list = mods_list + mod[::-1].replace("lmot.", "", 1)[::-1] + "\n"
                             sg.popup(mods_list, title="Installed mods")
                         if pack_edit_event == "Export to Curseforge pack":
-                            pack_export_command = oldruncmd(f"{packwiz} cf export")
-                            if pack_export_command != 0:
+                            pack_export_command = runcmd([packwiz, "cf", "export"])
+                            if pack_export_command.returncode != 0:
                                 log(f"There was an error exporting the pack \"{name}\"!", "printerror")
                                 log(f"error code {pack_export_command}", "debug")
                             else:
@@ -342,8 +367,8 @@ def main():
                                 else:
                                     runcmd(["xdg-open", pack_root])
                         if pack_edit_event == "Export to Modrinth pack":
-                            pack_export_command = oldruncmd(f"{packwiz} mr export")
-                            if pack_export_command != 0:
+                            pack_export_command = runcmd([packwiz, "mr", "export"])
+                            if pack_export_command.returncode != 0:
                                 log(f"There was an error exporting the pack \"{name}\"!", "printerror")
                                 log(f"error code {pack_export_command}", "debug")
                             else:
@@ -355,8 +380,8 @@ def main():
                                 else:
                                     runcmd(["xdg-open", pack_root])
                         if pack_edit_event == "Refresh pack":
-                            packwiz_refresh = oldruncmd(f"{packwiz} refresh")
-                            if packwiz_refresh != 0:
+                            packwiz_refresh_command = runcmd([packwiz, "refresh"])
+                            if packwiz_refresh_command.returncode != 0:
                                 log("There was an error refreshing the pack!", "printerror")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
@@ -365,8 +390,8 @@ def main():
                                 runcmd(["git", "add", "."])
                                 runcmd(["git", "commit", "-m", f"\"Refresh pack {name}\""])
                         if pack_edit_event == "Update all mods":
-                            packwiz_update_all = oldruncmd(f"{packwiz} update -a")
-                            if packwiz_update_all != 0:
+                            packwiz_update_all_command = runcmd([packwiz, "update", "-a"])
+                            if packwiz_update_all_command.returncode != 0:
                                 log("There was an error updating all mods!", "printerror")
                             else:
                                 log("Updating all mods succeeded.", "printsg")
@@ -374,8 +399,8 @@ def main():
                                 runcmd(["git", "add", "."])
                                 runcmd(["git", "commit", "-m", "\"Update all mods\""])
                         if pack_edit_event == "Update mod":
-                            packwiz_update_mod = oldruncmd(f"{packwiz} update {mod}")
-                            if packwiz_update_mod != 0:
+                            packwiz_update_mod_command = runcmd([packwiz, "update", mod])
+                            if packwiz_update_mod_command.returncode != 0:
                                 log("There was an error updating your mod(s)!", "printerror")
                             else:
                                 log("Updating your mod(s) succeeded.", "printsg")
@@ -388,11 +413,11 @@ def main():
                             pack_toml["version"] = pack_edit_values["version"]
                             pack_toml["versions"]["minecraft"] = pack_edit_values["minecraftversion"]
                             dumptoml(f"{pack_root}/pack.toml", pack_toml)
-                            packwiz_refresh = oldruncmd(f"{packwiz} refresh")
+                            packwiz_refresh_command = runcmd([packwiz, "refresh"])
                             if usegit:
                                 runcmd(["git", "add", "."])
                                 runcmd(["git", "commit", "-m", "\"Modify pack details\""])
-                            if packwiz_refresh != 0:
+                            if packwiz_refresh_command.returncode != 0:
                                 log("There was an error changing the pack details!", "printerror")
                                 log(f"error code {packwiz_refresh}", "debug")
                             else:
