@@ -19,6 +19,10 @@ import tomli_w
 def runcmd(cmd, shell=False, check=False):
     """
     Run command.
+    Args:
+    cmd: Command to run. Array with value for each arg, unless shell is True or there's only 1 arg (binary to run).
+    shell (opt, False): Whether to run command in a shell.
+    check (opt, False): Whether to throw exception if fail.
     """
     return subprocess.run(cmd, shell=shell, check=check)
 
@@ -26,7 +30,7 @@ def opentoml(filename):
     """
     Open toml file. Returns dict.
     Args:
-    filename; filename of file (with path) to open
+    filename: filename of file (with path) to open.
     """
     with open(filename, "rb") as toml_file:
         return tomli.load(toml_file)
@@ -35,8 +39,8 @@ def dumptoml(filename, var):
     """
     Takes in dict and filename. Dumps dict to file as toml.
     Args:
-    filename; filename of file (with path) to dump to
-    var; dict to dump from
+    filename: filename of file (with path) to dump to
+    var: dict to dump from
     """
     with open(filename, "wb") as toml_file:
         return tomli_w.dump(var, toml_file)
@@ -45,7 +49,7 @@ def createsettings(filename):
     """
     Create settings.
     Args:
-    filename; filename of settings toml file.
+    filename: filename of settings toml file.
     """
     settings = {
                 "backend": "qt",
