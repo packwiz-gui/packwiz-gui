@@ -23,8 +23,8 @@ def main():
             raise getopt.GetoptError("")
     except getopt.GetoptError:
         print("Usage:")
-        print("      --deps:            Install all non-compiling related dependencies (dependencies required to run the script).")
-        print("      --deps-nobuild:    Install required dependencies to start compiling or running the script.")
+        print("      --deps:            Install required dependencies to start running the script.")
+        print("      --deps-build:      Install required dependencies to start compiling or running the script.")
         print("      --pyinstaller:     Compile with pyinstaller. Stores in pyinstaller directory.")
         print("      --cxfreeze:        Compile with cx_freeze. Stores in cxfreeze firectory.")
         print("  -r, --remove:          Cleans up build directories")
