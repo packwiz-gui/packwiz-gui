@@ -35,7 +35,7 @@ jobs:
           name: ${{ runner.os }}_packwiz_gui_cxfreeze
           path: ${{ runner.os }}_packwiz_gui_cxfreeze.zip
 
-      - name: Upload to github actions
+      - name: Upload to github releases if building on tag
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
