@@ -61,38 +61,14 @@ def main():
     """
     Main function. Mostly using this docstring to make linter stfu
     """
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd", ["help", "debug", "reset-settings"])
-    except getopt.GetoptError:
-        print("Error: Unknown flag.\nUse --help to see available commands.")
-        sys.exit(1)
-    loglevel = 15
     if os.path.isdir(sys.path[0]):
         root = sys.path[0]
     else:
         root = os.getcwd()
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            print("")
-            print("  -h, --help:                        - This help message.")
-            print("  -d, --debug:                       - Verbose logging.")
-            print("      --reset-settings:              - Reset the settings file. Permanent.")
-            print("")
-            sys.exit()
-        elif opt in ("-d", "--debug"):
-            loglevel = 10
-        elif opt == "--reset-settings":
-            if os.path.isfile(f"{root}/settings.toml"):
-                os.remove(f"{root}/settings.toml")
-                createsettings(f"{root}/settings.toml")
-                print("Successfully reset settings.")
-                sys.exit()
-            else:
-                print("--reset-settings is unnecessary, you don't have a settings.toml file.")
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
     logging_handlers = [logging_file_handler, logging_stdout_handler]
-    logging.basicConfig(handlers=logging_handlers, level=loglevel)
+    logging.basicConfig(handlers=logging_handlers, level=10)
 
     def log(msg, logtype):
         if logtype == "debug":
