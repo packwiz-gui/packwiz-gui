@@ -2,7 +2,7 @@
 
 ## Documentation
 
-Documentation is located at [docs](./docs).
+Documentation is located [here](https://packwiz-gui.github.io).
 
 ## Discord server
 
