@@ -6,7 +6,9 @@ import re
 from platform import system
 from urllib.request import urlopen
 import tomli
+import threading
 import tomli_w
+import subprocess
 
 """
 Fabric packwiz server installer pack for packwiz-gui
@@ -70,7 +72,7 @@ print("#######################################")
 print("The below prompt will ask you some questions for the setup of the server. The value in [] is the recommended value, if you hit enter without specifying a version it will pass the recommended value.")
 
 fabric_installer_version = input("Fabric installer version (NOT fabric loader) [0.10.2]: ")
-if fabric_installer_version is None: 
+if fabric_installer_version == "": 
     fabric_installer_version = settings["defaultFabricInstaller"]
 
 pack_name = input("Pack name: ")
@@ -110,15 +112,20 @@ pack_root = f'{INSTANCES_DIR}/{pack_name}'
 server_root = f'{pack_root}/server/'
 if not os.path.exists(f'{server_root}'):
     os.makedirs(f'{server_root}')
-os.chdir(pack_root)
-os.system(f'{PACKWIZ_BINARY} serve')
+os.chdir('C:/Users/Exo/Projects/packwiz-gui/fabric-installer-script/instances/exoexo')
+packwiz_serve_run =f'{PACKWIZ_BINARY} serve'
+serve_thread  = threading.Thread(target=subprocess.run, args=(packwiz_serve_run), daemon=True)
+serve_thread.start()
 os.chdir(server_root)
-wget.download(f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar", 'fabric-installer.jar')
+installer_jar_url = f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar"
+print(installer_jar_url)
+wget.download(installer_jar_url, 'fabric-installer.jar')
 wget.download(f'https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar')
 wget.download(f'https://github.com/packwiz/packwiz-installer/releases/download/v0.3.2/packwiz-installer.jar')
-os.system(f'java -jar installer.jar server -mcversion {minecraft_version} -downloadMinecraft')
+
+os.system(f'java -jar fabric-installer.jar server -mcversion {minecraft_version} -downloadMinecraft')
+os.system(f'java -jar packwiz-installer-bootstrap.jar http://{ip_addr}:8080/pack.toml')
 startshfile = f"""
-java -jar packwiz-installer.bootstrap.jar http://{ip_addr}:8080/pack.toml
 java -Xmx{system_ram} -jar fabric-server-launch.jar
 """
 if PLATFORM == 'Windows':
@@ -127,3 +134,4 @@ if PLATFORM == 'Windows':
 elif PLATFORM == 'Unix':
     with open("start.sh", "a", encoding="UTF-8") as f:
         f.write(startshfile)
+sys.exit()
