@@ -1,3 +1,5 @@
+cx-Freeze==6.9
+pyinstaller==4.7
 PySimpleGUI==4.56.0
 PySimpleGUIQt==0.35.0
 tomli==2.0.0
