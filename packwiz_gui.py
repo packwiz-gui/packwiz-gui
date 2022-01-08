@@ -10,7 +10,6 @@ import platform
 import sys
 import subprocess
 import logging
-import getopt
 import webbrowser
 import shutil
 import tomli
