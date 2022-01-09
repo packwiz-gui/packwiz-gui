@@ -31,8 +31,8 @@ UNIXTYPE = None
 ROOT = f"{os.getcwd()}/.."
 if not os.path.isfile(f"{ROOT}/packwiz_gui.py"):
     ROOT = os.getcwd()
-PACKWIZ_BINARY = f"{ROOT}/bin/packwiz.exe" if platform.system() == "Windows" else f"{ROOT}/bin/packwiz"
-INSTANCES_DIR = f"{ROOT}/instances"
+PACKWIZ_BINARY = f"{ROOT}\\bin\packwiz.exe" if platform.system() == "Windows" else f"{ROOT}/bin/packwiz"
+INSTANCES_DIR = f"{ROOT}\instances"
 fabric_installer_version = None
 fabric_loader_version = None
 pack_name = None
@@ -94,8 +94,8 @@ server_root = f"{pack_root}/server/"
 if not os.path.exists(f"{server_root}"):
     os.makedirs(f"{server_root}")
 os.chdir(pack_root)
-def runserve(pack_root):
-    subprocess.run([f"cd {pack_root} && {PACKWIZ_BINARY} serve"], shell=True)
+def runserve():
+    subprocess.run([f"{PACKWIZ_BINARY} serve"], shell=True)
 serve_thread  = threading.Thread(target=runserve)
 serve_thread.start()
 os.chdir(server_root)
