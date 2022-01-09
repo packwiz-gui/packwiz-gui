@@ -15,11 +15,11 @@ jobs:
         with:
           python-version: 3.9
       - name: Install dependencies
-        run: python3 build.py --deps-build
+        run: python3 ./utils/build.py --deps-build
       - name: Compile pyinstaller
-        run:  python3 build.py --pyinstaller
+        run:  python3 ./utils/build.py --pyinstaller
       - name: Compile cxfreeze
-        run: python3 build.py --cxfreeze
+        run: python3 ./utils/build.py --cxfreeze
       - name: Zip files for upload
         run: |
              tar -acvf ${{ runner.os }}_packwiz_gui_cxfreeze.zip cxfreeze/build
