@@ -99,8 +99,6 @@ installer_jar_url = f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{
 print(installer_jar_url)
 wget.download(installer_jar_url, "fabric-installer.jar")
 wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
-wget.download(f"https://github.com/packwiz/packwiz-installer/releases/download/v0.3.2/packwiz-installer.jar")
-
 os.system(f"java -jar fabric-installer.jar server -mcversion {minecraft_version} -downloadMinecraft")
 os.system(f"java -jar packwiz-installer-bootstrap.jar http://localhost:8080/pack.toml")
 startshfile = f"java -Xms{str(int(system_ram) / 4)}M -Xmx{system_ram}M -jar fabric-server-launch.jar"
