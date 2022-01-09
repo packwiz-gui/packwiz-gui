@@ -109,7 +109,7 @@ os.chdir(server_root)
 installer_jar_url = f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar"
 print(installer_jar_url)
 print(os.getcwd())
-wget.download(installer_jar_url)
+wget.download(installer_jar_url, 'fabric-installer.jar')
 wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
 subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"])
 subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", f"http://localhost:8080/pack.toml"])
