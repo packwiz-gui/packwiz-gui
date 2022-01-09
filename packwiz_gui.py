@@ -190,7 +190,7 @@ def main():
                             os.chdir(pack_root)
                             pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
                             with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
-                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar")
+                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**")
                             with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
                                 gitattrib.write("* -text")
                             with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
