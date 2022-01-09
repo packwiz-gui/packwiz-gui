@@ -66,18 +66,17 @@ if fabric_installer_version == "":
     fabric_installer_version = "0.10.2"
 
 pack_name = None
-while pack_name in ("", None):
+while pack_name in ("", None) or not os.path.isfile(f"{INSTANCES_DIR}/{pack_name}/pack.toml"):
     pack_name = input("Pack name: ")
     if pack_name == "":
         print("Error: Please specify a pack name!")
-    
-minecraft_version = input("Minecraft version [1.18.1]: ")
-if minecraft_version == "":
-    minecraft_version = "1.18.1"
+    elif not os.path.isfile(f"{INSTANCES_DIR}/{pack_name}/pack.toml"):
+        print("Error: please enter a valid pack!")
 
-fabric_loader_version = input("Fabric loader version [0.12.12]: ")
-if fabric_loader_version == "": 
-    fabric_loader_version = "0.12.12"
+pack_toml = opentoml(f"{INSTANCES_DIR}/{pack_name}/pack.toml")
+
+minecraft_version = pack_toml["versions"]["minecraft"]
+fabric_loader_version = pack_toml["versions"]["fabric"]
 
 system_ram = input("RAM to allocate to the minecraft server in MBs [4096]: ")
 if system_ram == "":
@@ -107,8 +106,6 @@ serve_thread  = threading.Thread(target=runserve, daemon=True)
 serve_thread.start()
 os.chdir(server_root)
 installer_jar_url = f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar"
-print(installer_jar_url)
-print(os.getcwd())
 wget.download(installer_jar_url, 'fabric-installer.jar')
 wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
 subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"])
