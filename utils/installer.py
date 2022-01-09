@@ -95,7 +95,7 @@ if not os.path.exists(f"{server_root}"):
     os.makedirs(f"{server_root}")
 os.chdir(pack_root)
 def runserve():
-    pack_root = pack_root.replace("/", "\\") if platform.system == "Windows" else pack_root
+    pack_root = pack_root.replace("/", "\\") if platform.system() == "Windows" else pack_root
     subprocess.run([f"cd {pack_root} && {PACKWIZ_BINARY} serve"], shell=True)
 serve_thread  = threading.Thread(target=runserve)
 serve_thread.start()
