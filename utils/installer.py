@@ -32,7 +32,7 @@ ROOT = f"{os.getcwd()}/.."
 if not os.path.isfile(f"{ROOT}/packwiz_gui.py"):
     ROOT = os.getcwd()
 PACKWIZ_BINARY = f"{ROOT}\\bin\packwiz.exe" if platform.system() == "Windows" else f"{ROOT}/bin/packwiz"
-INSTANCES_DIR = f"{ROOT}\instances"
+INSTANCES_DIR = f"{ROOT}\instances" if platform.system() == "Windows" else f"{ROOT}/instances"
 fabric_installer_version = None
 fabric_loader_version = None
 pack_name = None
