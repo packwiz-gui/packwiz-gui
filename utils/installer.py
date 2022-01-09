@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
-import wget
-import os
-import socket
-import re
-import platform
-from urllib.request import urlopen
-import tomli
-import threading
-import tomli_w
-import subprocess
-import http.server
-import socketserver
-
 """
 Fabric packwiz server installer pack for packwiz-gui
 """
+
+import os
+import platform
+import threading
+import subprocess
+import http.server
+import socketserver
+import tomli
+import wget
+
 def opentoml(filename):
     """
     Open toml file. Returns dict.
@@ -106,9 +102,9 @@ serve_thread.start()
 os.chdir(server_root)
 
 wget.download(f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar", 'fabric-installer.jar')
-wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
-subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"])
-subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", f"http://localhost:8080/pack.toml"])
+wget.download("https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
+subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"], check=True)
+subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", "http://localhost:8080/pack.toml"], check=True)
 
 startshfile = f"java -Xms{str(int(int(system_ram) / 4))}M -Xmx{system_ram}M -jar fabric-server-launch.jar"
 with open("start.bat", "a", encoding="UTF-8") as f:
@@ -116,4 +112,4 @@ with open("start.bat", "a", encoding="UTF-8") as f:
 with open("start.sh", "a", encoding="UTF-8") as f:
     f.write(startshfile)
 if PLATFORM == "Unix":
-    subprocess.run(["chmod", "+x", "start.sh"])
+    subprocess.run(["chmod", "+x", "start.sh"], check=True)
