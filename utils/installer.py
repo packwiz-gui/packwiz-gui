@@ -28,8 +28,9 @@ def opentoml(filename):
 PLATFORM = None
 SHELL = None
 UNIXTYPE = None
-ROOT = f"{os.getcwd()}/.."
-if not os.path.isfile(f"{ROOT}/packwiz_gui.py"):
+ROOT = f"{os.getcwd()}"
+while not os.path.isfile(f"{ROOT}/packwiz_gui.py"):
+    os.chdir("..")
     ROOT = os.getcwd()
 PACKWIZ_BINARY = f"{ROOT}\\bin\\packwiz.exe" if platform.system() == "Windows" else f"{ROOT}/bin/packwiz"
 INSTANCES_DIR = f"{ROOT}/instances"
@@ -99,7 +100,7 @@ print(installer_jar_url)
 wget.download(installer_jar_url, "fabric-installer.jar")
 wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
 subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"])
-subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", "file://" + pack_root.replace("\\", "/") + "/pack.toml"])
+subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", f"file://{pack_root}/pack.toml"])
 startshfile = f"java -Xms{str(int(system_ram) / 4)}M -Xmx{system_ram}M -jar fabric-server-launch.jar"
 if PLATFORM == "Windows":
     with open("start.bat", "a", encoding="UTF-8") as f:
