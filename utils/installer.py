@@ -87,7 +87,7 @@ print(f"Fabric installer version: {fabric_installer_version}")
 print(f"Pack name: {pack_name}")
 print(f"Minecraft version: {minecraft_version}")
 print(f"Fabric loader version: {fabric_loader_version}")
-print(f"RAM to allocate: {sys}")
+print(f"RAM to allocate: {system_ram}")
 
 pack_root = f"{INSTANCES_DIR}/{pack_name}"
 server_root = f"{pack_root}/server/"
