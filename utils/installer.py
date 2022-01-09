@@ -95,9 +95,8 @@ if not os.path.exists(f"{server_root}"):
     os.makedirs(f"{server_root}")
 os.chdir(pack_root)
 def runserve(pack_root):
-    pack_root = pack_root.replace("/", "\\") if platform.system() == "Windows" else pack_root
     subprocess.run([f"cd {pack_root} && {PACKWIZ_BINARY} serve"], shell=True)
-serve_thread  = threading.Thread(target=runserve, args=(pack_root,))
+serve_thread  = threading.Thread(target=runserve)
 serve_thread.start()
 os.chdir(server_root)
 installer_jar_url = f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar"
