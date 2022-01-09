@@ -114,7 +114,7 @@ wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/
 subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"])
 subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", f"http://localhost:8080/pack.toml"])
 serve_thread.join(0)
-startshfile = f"java -Xms{str(int(system_ram) / 4)}M -Xmx{system_ram}M -jar fabric-server-launch.jar"
+startshfile = f"java -Xms{str(int(int(system_ram) / 4))}M -Xmx{system_ram}M -jar fabric-server-launch.jar"
 if PLATFORM == "Win":
     with open("start.bat", "a", encoding="UTF-8") as f:
         f.write(startshfile)
