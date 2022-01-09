@@ -18,13 +18,13 @@ def main():
     python = "python" if platform.system() == "Windows" else "python3"
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "deps-nobuild", "pyinstaller", "cxfreeze", "remove"])
+        opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "deps-build", "pyinstaller", "cxfreeze", "remove"])
         if opts == []:
             raise getopt.GetoptError("")
     except getopt.GetoptError:
         print("Usage:")
-        print("      --deps:            Install all non-compiling related dependencies (dependencies required to run the script).")
-        print("      --deps-nobuild:    Install required dependencies to start compiling or running the script.")
+        print("      --deps:            Install required dependencies to start running the script.")
+        print("      --deps-build:      Install required dependencies to start compiling or running the script.")
         print("      --pyinstaller:     Compile with pyinstaller. Stores in pyinstaller directory.")
         print("      --cxfreeze:        Compile with cx_freeze. Stores in cxfreeze firectory.")
         print("  -r, --remove:          Cleans up build directories")
@@ -61,8 +61,9 @@ def main():
     for opt, arg in opts:
         if opt == "--deps":
             os.system(f"{python} -m pip install -r {root}/requirements.txt")
-        if opt == "--deps-nobuild":
-            os.system(f"{python} -m pip install -r {root}/requirements-nobuild.txt")
+        if opt == "--deps-build":
+            os.system(f"{python} -m pip install -r {root}/requirements.txt")
+            os.system(f"{python} -m pip install -r {root}/requirements-build.txt")
         elif opt == "--pyinstaller":
             compilewith("pyinstaller")
         elif opt == "--cxfreeze":

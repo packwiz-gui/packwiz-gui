@@ -10,7 +10,6 @@ import platform
 import sys
 import subprocess
 import logging
-import getopt
 import webbrowser
 import shutil
 import tomli
@@ -19,29 +18,18 @@ import tomli_w
 def runcmd(cmd, shell=False, check=False):
     """
     Run command.
+    Args:
+    cmd: Command to run. Array with value for each arg, unless shell is True or there's only 1 arg (binary to run).
+    shell (opt, False): Whether to run command in a shell.
+    check (opt, False): Whether to throw exception if fail.
     """
     return subprocess.run(cmd, shell=shell, check=check)
-
-def oldruncmd(cmd):
-    """
-    DEPRECATED!!!
-    Run command. Get exit code as return. Simple enough.
-    Throw in as array to run them all, get back an array of exit codes.
-    """
-    print("Warning! deprecated function used.")
-    if isinstance(cmd, str):
-        return os.system(cmd)
-    if isinstance(cmd, list):
-        runcmdarr = []
-        for stuff in cmd:
-            runcmdarr.append(os.system(stuff))
-        return runcmdarr
 
 def opentoml(filename):
     """
     Open toml file. Returns dict.
     Args:
-    filename; filename of file (with path) to open
+    filename: filename of file (with path) to open.
     """
     with open(filename, "rb") as toml_file:
         return tomli.load(toml_file)
@@ -50,17 +38,17 @@ def dumptoml(filename, var):
     """
     Takes in dict and filename. Dumps dict to file as toml.
     Args:
-    filename; filename of file (with path) to dump to
-    var; dict to dump from
+    filename: filename of file (with path) to dump to
+    var: dict to dump from
     """
     with open(filename, "wb") as toml_file:
-        tomli_w.dump(var, toml_file)
+        return tomli_w.dump(var, toml_file)
 
 def createsettings(filename):
     """
     Create settings.
     Args:
-    filename; filename of settings toml file.
+    filename: filename of settings toml file.
     """
     settings = {
                 "backend": "qt",
@@ -75,46 +63,20 @@ def createsettings(filename):
                 }
     dumptoml(filename, settings)
 
-version_number = '1.1.0'
+VERSION_NUMBER = '1.1.2'
 
 def main():
     """
     Main function. Mostly using this docstring to make linter stfu
     """
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd", ["help", "debug", "reset-settings"])
-    except getopt.GetoptError:
-        print("Error: Unknown flag.\nUse --help to see available commands.")
-        sys.exit(1)
-    loglevel = 15
     if os.path.isdir(sys.path[0]):
         root = sys.path[0]
     else:
         root = os.getcwd()
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            print("")
-            print("  -h, --help:                        - This help message.")
-            print("  -d, --debug:                       - Verbose logging.")
-            print("      --reset-settings:              - Reset the settings file. Permanent.")
-            print("")
-            sys.exit()
-        elif opt in ("-d", "--debug"):
-            loglevel = 10
-        elif opt == "--reset-settings":
-            if os.path.isfile(f"{root}/settings.toml"):
-                os.remove(f"{root}/settings.toml")
-                createsettings(f"{root}/settings.toml")
-                print("Successfully reset settings.")
-                sys.exit()
-            else:
-                print("--reset-settings is unnecessary, you don't have a settings.toml file.")
-                #print("settings.toml does not exist! Run normally to create.")
-                #sys.exit()
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
     logging_handlers = [logging_file_handler, logging_stdout_handler]
-    logging.basicConfig(handlers=logging_handlers, level=loglevel)
+    logging.basicConfig(handlers=logging_handlers, level=10)
 
     def log(msg, logtype):
         if logtype == "debug":
@@ -129,7 +91,7 @@ def main():
         elif logtype == "error":
             logging.error(msg=msg)
         elif logtype == "errorsg":
-            logging.error(msg=msg)
+            print(msg)
             sg.popup_error(msg)
         elif logtype == "critical":
             logging.critical(msg=msg)
@@ -182,16 +144,16 @@ def main():
                 [sg.T("")],
                 [sg.B("Create a new pack")],
                 [sg.T("")],
-                [sg.B("Import an existing pack")],
-                [sg.T("")],
                 [sg.B("Modify pack")],
+                [sg.T("")],
+                [sg.B("Import an existing pack")],
                 [sg.T("")],
                 [sg.B("Download packwiz")],
                 [sg.T("")],
                 [sg.B("Settings")],
                 [sg.T("")],
                 [sg.B("Close packwiz-gui")],
-                [sg.T(f"packwiz-gui v{version_number}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
+                [sg.T(f"packwiz-gui v{VERSION_NUMBER}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
                 ]
     main_menu_window = sg.Window("Main Menu", main_menu)
     while True:
@@ -215,8 +177,6 @@ def main():
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
                 name = pack_create_values["name"]
-                #name_escaped = name.replace("\"", "_")
-                invalid_char_list = ["*", "\\", "/", "(", ")", "\""]
                 name_escaped = name.replace("*", "_").replace("\\", "_").replace("/", "_").replace("(", "_").replace(")", "_").replace(")", "_").replace("\"", "_")
                 pack_root = f"{root}/instances/{name_escaped}"
                 if os.path.isdir(pack_root):
@@ -227,27 +187,32 @@ def main():
                     mc_version = pack_create_values["minecraftversion"]
                     modloader = pack_create_values["modloader"]
                     modloader_version = pack_create_values["modloaderversion"]
-                    os.mkdir(pack_root)
-                    os.chdir(pack_root)
-                    pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
-                    with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
-                        pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore")
-                    with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
-                        gitattrib.write("* -text")
-                    with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
-                        gitignore.write("*.zip\n*.mrpack")
-                    os.mkdir("mods")
-                    if usegit:
-                        runcmd(["git", "init"])
-                        runcmd(["git", "add", "."])
-                        runcmd(["git", "commit", "-m", f"\"Create pack {name}\""])
-                    os.chdir(root)
-                    if pack_create_command.returncode != 0:
-                        log(f"There was an error creating the pack \"{name}\"!", "printerror")
-                        log(f"error code {pack_create_command}", "debug")
-                        shutil.rmtree(pack_root)
-                    else:
-                        log(f"Pack \"{name}\" created.", "printsg")
+                    for val in [author, pack_version, mc_version, modloader, modloader_version]:
+                        if val == "":
+                            log("Error: you must fill in all the details!", "errorsg")
+                        else:
+                            os.mkdir(pack_root)
+                            os.chdir(pack_root)
+                            pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
+                            with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
+                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore")
+                            with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
+                                gitattrib.write("* -text")
+                            with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
+                                gitignore.write("*.zip\n*.mrpack")
+                            os.mkdir("mods")
+                            if usegit:
+                                runcmd(["git", "init"])
+                                runcmd(["git", "add", "."])
+                                runcmd(["git", "commit", "-m", f"\"Create pack {name}\""])
+                            os.chdir(root)
+                            if pack_create_command.returncode != 0:
+                                log(f"There was an error creating the pack \"{name}\"!", "printerror")
+                                log(f"error code {pack_create_command}", "debug")
+                                shutil.rmtree(pack_root)
+                            else:
+                                log(f"Pack \"{name}\" created.", "printsg")
+                        break
             pack_create_window.close()
             main_menu_window.UnHide()
         if main_menu_event == "Import an existing pack":
@@ -262,13 +227,24 @@ def main():
             if pack_import_event == "Import":
                 name = pack_import_values[0]
                 pack_root = f"{root}/instances/{name}"
-                os.mkdir(pack_root)
-                os.chdir(pack_root)
-                pack_import_command = runcmd([packwiz, "cf", "import", pack_import_values[1]])
-                if pack_import_command.returncode != 0:
-                    log(f"Error while importing pack {name}!", "errorsg")
+                if os.path.isdir(pack_root):
+                    log("Error: pack already exists!", "errorsg")
                 else:
-                    log("Successfully imported pack.", "printsg")
+                    if pack_import_values[1] == "":
+                        log("Error: path must not be empty!", "errorsg")
+                    else:
+                        os.mkdir(pack_root)
+                        os.chdir(pack_root)
+                        pack_import_command = runcmd([packwiz, "cf", "import", pack_import_values[1]])
+                        if pack_import_command.returncode != 0:
+                            log(f"Error while importing pack {name}!", "errorsg")
+                        else:
+                            log("Successfully imported pack.", "printsg")
+                        pack_toml = opentoml(f"{pack_root}/pack.toml")
+                        pack_toml["name"] = name
+                        pack_toml["author"] = "Unknown"
+                        pack_toml["version"] = "1.0.0"
+                        dumptoml(f"{pack_root}/pack.toml", pack_toml)
             pack_import_window.close()
             main_menu_window.UnHide()
         if main_menu_event == "Modify pack":
@@ -383,7 +359,7 @@ def main():
                             packwiz_refresh_command = runcmd([packwiz, "refresh"])
                             if packwiz_refresh_command.returncode != 0:
                                 log("There was an error refreshing the pack!", "printerror")
-                                log(f"error code {packwiz_refresh}", "debug")
+                                log(f"error code {packwiz_refresh_command}", "debug")
                             else:
                                 log("Successfully refreshed pack.", "printsg")
                             if usegit:
@@ -408,6 +384,12 @@ def main():
                                 runcmd(["git", "add", "."])
                                 runcmd(["git", "commit", "-m", f"\"Update {mod}\""])
                         if pack_edit_event == "Change":
+                            if pack_edit_values["name"] != pack_toml["name"]:
+                                os.chdir(root)
+                                name = pack_edit_values["name"]
+                                os.rename(pack_root, f"{root}/instances/{name}")
+                                pack_root = f"{root}/instances/{name}"
+                                os.chdir(pack_root)
                             pack_toml["name"] = pack_edit_values["name"]
                             pack_toml["author"] = pack_edit_values["author"]
                             pack_toml["version"] = pack_edit_values["version"]
@@ -419,7 +401,7 @@ def main():
                                 runcmd(["git", "commit", "-m", "\"Modify pack details\""])
                             if packwiz_refresh_command.returncode != 0:
                                 log("There was an error changing the pack details!", "printerror")
-                                log(f"error code {packwiz_refresh}", "debug")
+                                log(f"error code {packwiz_refresh_command}", "debug")
                             else:
                                 log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.", "printsg")
             if pack_list_event == "Delete":
