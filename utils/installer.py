@@ -31,8 +31,8 @@ UNIXTYPE = None
 ROOT = f"{os.getcwd()}/.."
 if not os.path.isfile(f"{ROOT}/packwiz_gui.py"):
     ROOT = os.getcwd()
-PACKWIZ_BINARY = f"{ROOT}\\bin\packwiz.exe" if platform.system() == "Windows" else f"{ROOT}/bin/packwiz"
-INSTANCES_DIR = f"{ROOT}\instances" if platform.system() == "Windows" else f"{ROOT}/instances"
+PACKWIZ_BINARY = f"{ROOT}\\bin\\packwiz.exe" if platform.system() == "Windows" else f"{ROOT}/bin/packwiz"
+INSTANCES_DIR = f"{ROOT}/instances"
 fabric_installer_version = None
 fabric_loader_version = None
 pack_name = None
@@ -90,7 +90,7 @@ print(f"Fabric loader version: {fabric_loader_version}")
 print(f"RAM to allocate: {system_ram}")
 
 pack_root = f"{INSTANCES_DIR}/{pack_name}"
-server_root = f"{pack_root}/server/"
+server_root = f"{pack_root}/server"
 if not os.path.exists(f"{server_root}"):
     os.makedirs(f"{server_root}")
 os.chdir(pack_root)
