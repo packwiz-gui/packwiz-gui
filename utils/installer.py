@@ -11,7 +11,8 @@ import tomli
 import threading
 import tomli_w
 import subprocess
-from http.server import BaseHTTPRequestHandler, HTTPServer
+import http.server
+import socketserver
 
 """
 Fabric packwiz server installer pack for packwiz-gui
@@ -45,12 +46,11 @@ SHELL = None
 if platform.system() == "Windows":
     PLATFORM = "Win"
     UNIXTYPE = "Non-unix"
-elif platform.system() == "Linux":
+    PYTHON = "python"
+else:
     PLATFORM = "Unix"
-    UNIXTYPE = "Linux"
-elif platform.system() == "Darwin":
-    PLATFORM = "Unix"
-    UNIXTYPE = "macOS"
+    UNIXTYPE = "macOS" if platform.system() == "Darwin" else "Linux"
+    PYTHON = "python3"
 
 if PLATFORM == "Win":
     os.system("title Fabric + packwiz installer script")
@@ -95,24 +95,25 @@ pack_root = f"{INSTANCES_DIR}/{pack_name}"
 server_root = f"{pack_root}/server"
 if not os.path.exists(f"{server_root}"):
     os.makedirs(f"{server_root}")
-os.chdir(pack_root)
 def runserve():
-    os.chdir(pack_root)
-    os.chdir(pack_root)
-    os.chdir(pack_root)
-    os.system("python -m http.server 8080")
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=pack_root, **kwargs)
+    port = 8080
+    with socketserver.TCPServer(("", port), Handler) as httpd:
+        print("serving at port", port)
+        httpd.serve_forever()
 serve_thread  = threading.Thread(target=runserve, daemon=True)
 serve_thread.start()
 os.chdir(server_root)
-#os.chdir(server_root)
-os.chdir(server_root)
 installer_jar_url = f"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{fabric_installer_version}/fabric-installer-{fabric_installer_version}.jar"
 print(installer_jar_url)
-wget.download(installer_jar_url, "server/fabric-installer.jar")
-wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar", "server/packwiz-installer-bootstrap.jar")
+print(os.getcwd())
+wget.download(installer_jar_url)
+wget.download(f"https://github.com/packwiz/packwiz-installer-bootstrap/releases/download/v0.0.3/packwiz-installer-bootstrap.jar")
 subprocess.run(["java", "-jar", "fabric-installer.jar", "server", "-mcversion", minecraft_version, "-downloadMinecraft"])
 subprocess.run(["java", "-jar", "packwiz-installer-bootstrap.jar", f"http://localhost:8080/pack.toml"])
-serve_thread._stop()
+serve_thread.join(0)
 startshfile = f"java -Xms{str(int(system_ram) / 4)}M -Xmx{system_ram}M -jar fabric-server-launch.jar"
 if PLATFORM == "Win":
     with open("start.bat", "a", encoding="UTF-8") as f:
