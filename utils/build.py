@@ -33,7 +33,7 @@ def main():
     if len(opts) > 1:
         raise getopt.GetoptError("Cannot have more than 1 option.")
 
-    root = f'{sys.path[0]}/..' if os.path.isdir(f'{sys.path[0]}/..') else f'{os.getcwd()}/..'
+    root = f"{sys.path[0]}/.."
 
     def compilewith(builder):
         """
