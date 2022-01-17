@@ -137,7 +137,7 @@ def main():
     print(f"Done! Server created in {server_root}!")
     print("Use start.bat (Windows) or start.sh (Linux/MacOS) to start the server.")
     print("Make sure to agree to the EULA in eula.txt.")
-    print("You do need to run it through a command prompt.")
+    print("You do need to run it through a command line ('cmd' on Windows, 'terminal' everywhere else).")
 
 if __name__ == "__main__":
     main()
