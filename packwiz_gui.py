@@ -14,6 +14,7 @@ import webbrowser
 import shutil
 import tomli
 import tomli_w
+import pwgui_datafix
 
 def runcmd(cmd, shell=False, check=False):
     """
@@ -196,6 +197,7 @@ def main():
                             with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
                                 gitignore.write("*.zip\n*.mrpack")
                             os.mkdir("mods")
+                            dumptoml("pwgui.toml", {"version": VERSION_NUMBER})
                             if usegit:
                                 runcmd(["git", "init"])
                                 runcmd(["git", "add", "."])
@@ -265,6 +267,7 @@ def main():
                     log(f"The pack \"{name}\" does not exist!", "printerror")
                 else:
                     os.chdir(pack_root)
+                    pwgui_datafix.main(root=root, pack_root=pack_root, opentoml=opentoml, dumptoml=dumptoml)
                     pack_toml = opentoml(f"{pack_root}/pack.toml")
                     pack_edit = [
                                 [sg.T("Source:"), sg.Drop(["modrinth", "curseforge"], key="source")],
