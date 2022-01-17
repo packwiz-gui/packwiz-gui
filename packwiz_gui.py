@@ -65,10 +65,9 @@ def main():
     """
     Main function. Mostly using this docstring to make linter stfu
     """
-    if os.path.isdir(sys.path[0]):
-        root = sys.path[0]
-    else:
-        root = os.getcwd()
+
+    root = sys.path[0] if os.path.isdir(sys.path[0]) else os.getcwd()
+
     logging_file_handler = logging.FileHandler(filename=f"{root}/log.txt")
     logging_stdout_handler = logging.StreamHandler(sys.stdout)
     logging_handlers = [logging_file_handler, logging_stdout_handler]
@@ -149,7 +148,7 @@ def main():
                 [sg.B("Settings")],
                 [sg.T("")],
                 [sg.B("Close packwiz-gui")],
-                [sg.T(f"packwiz-gui v{VERSION_NUMBER}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
+                [sg.T(f"packwiz-gui {VERSION_NUMBER}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
                 ]
     main_menu_window = sg.Window("Main Menu", main_menu)
     while True:
@@ -172,9 +171,8 @@ def main():
             pack_create_window = sg.Window("Create new pack", pack_create)
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
-                name = pack_create_values["name"]
-                name_escaped = name.replace("*", "_").replace("\\", "_").replace("/", "_").replace("(", "_").replace(")", "_").replace(")", "_").replace("\"", "_")
-                pack_root = f"{root}/instances/{name_escaped}"
+                name = pack_create_values["name"].replace("*", "_").replace("\\", "_").replace("/", "_").replace("(", "_").replace(")", "_").replace("\"", "_")
+                pack_root = f"{root}/instances/{name}"
                 if os.path.isdir(pack_root):
                     log(f"The pack \"{name}\" already exists!", "printerror")
                 else:
@@ -191,11 +189,11 @@ def main():
                             os.chdir(pack_root)
                             pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
                             with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
-                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**")
+                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**\n")
                             with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
-                                gitattrib.write("* -text")
+                                gitattrib.write("* -text\n")
                             with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
-                                gitignore.write("*.zip\n*.mrpack")
+                                gitignore.write("*.zip\n*.mrpack\n")
                             os.mkdir("mods")
                             dumptoml("pwgui.toml", {"version": VERSION_NUMBER})
                             if usegit:
