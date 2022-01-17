@@ -18,7 +18,7 @@ def main():
     python = "python" if platform.system() == "Windows" else "python3"
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "deps-build", "pyinstaller", "cxfreeze", "remove"])
+        opts, args = getopt.getopt(sys.argv[1:], "r", ["deps", "deps-build", "pyinstaller", "cxfreeze", "ci", "remove"])
         if opts == []:
             raise getopt.GetoptError("")
     except getopt.GetoptError:
@@ -56,7 +56,6 @@ def main():
             print(f"Error: you do not have {builder} installed.")
         else:
             print(f"Error: error detected, code {command}.")
-        sys.exit(command)
 
     for opt, arg in opts:
         if opt == "--deps":
@@ -67,6 +66,11 @@ def main():
         elif opt == "--pyinstaller":
             compilewith("pyinstaller")
         elif opt == "--cxfreeze":
+            compilewith("cxfreeze")
+        elif opt == "--ci":
+            os.system(f"{python} -m pip install -r {root}/requirements.txt")
+            os.system(f"{python} -m pip install -r {root}/requirements-build.txt")
+            compilewith("pyinstaller")
             compilewith("cxfreeze")
         elif opt in ("-r", "--remove"):
             if os.path.isdir(f"{root}/pyinstaller"):

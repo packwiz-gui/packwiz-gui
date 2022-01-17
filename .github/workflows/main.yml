@@ -14,12 +14,8 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Install dependencies
-        run: python3 ./utils/build.py --deps-build
-      - name: Compile pyinstaller
-        run:  python3 ./utils/build.py --pyinstaller
-      - name: Compile cxfreeze
-        run: python3 ./utils/build.py --cxfreeze
+      - name: Do the actual building and shit
+        run: python3 ./utils/build.py --ci
       - name: Zip files for upload
         run: |
              tar -acvf ${{ runner.os }}_packwiz_gui_cxfreeze.zip cxfreeze/build
