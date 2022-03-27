@@ -15,7 +15,7 @@ import shutil
 import tomli
 import tomli_w
 
-def runcmd(cmd, shell=False, check=False):
+def runcmd(cmd, shell=False, check=False, input:str=None):
     """
     Run command.
     Args:
@@ -23,6 +23,8 @@ def runcmd(cmd, shell=False, check=False):
     shell (opt, False): Whether to run command in a shell.
     check (opt, False): Whether to throw exception if fail.
     """
+    if input:
+        return subprocess.run(cmd, shell=shell, check=check, input=input.encode())
     return subprocess.run(cmd, shell=shell, check=check)
 
 def opentoml(filename):
@@ -297,7 +299,7 @@ def main():
                             break
                         if pack_edit_event == "Add Mod":
                             os.chdir(pack_root)
-                            mod_add_command = runcmd([packwiz, source, "install", mod])
+                            mod_add_command = runcmd([packwiz, source, "install", mod], input="Y\n")
                             if mod_add_command.returncode != 0:
                                 log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "printerror")
                                 log(f"error code {mod_add_command}", "debug")
