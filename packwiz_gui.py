@@ -15,7 +15,8 @@ import shutil
 import tomli
 import tomli_w
 
-def runcmd(cmd, shell=False, check=False, input:str=None):
+
+def runcmd(cmd, shell=False, check=False):
     """
     Run command.
     Args:
@@ -23,8 +24,6 @@ def runcmd(cmd, shell=False, check=False, input:str=None):
     shell (opt, False): Whether to run command in a shell.
     check (opt, False): Whether to throw exception if fail.
     """
-    if input:
-        return subprocess.run(cmd, shell=shell, check=check, input=input.encode())
     return subprocess.run(cmd, shell=shell, check=check)
 
 def opentoml(filename):
@@ -53,11 +52,11 @@ def createsettings(filename):
     filename: filename of settings toml file.
     """
     settings = {
-                "backend": "qt",
-                "tktheme": "DarkGrey9",
-                "qttheme": "SystemDefaultForReal",
-                "usegit": False
-                }
+        "backend": "qt",
+        "tktheme": "DarkGrey9",
+        "qttheme": "SystemDefaultForReal",
+        "usegit": False
+    }
     dumptoml(filename, settings)
 
 VERSION_NUMBER = '1.1.2'
@@ -119,7 +118,7 @@ def main():
         current_backend = settings["backend"]
     else:
         log("Error: backend invalid in settings file", "critical")
-    usegit =  settings["usegit"]
+    usegit = settings["usegit"]
     log(f"root dir is {root}", "debug")
     if platform.system() == "Windows":
         packwiz = f"{root}\\bin\\packwiz.exe"
@@ -131,26 +130,26 @@ def main():
         log("No instances folder, creating...", "warning")
     if not os.path.isdir(f"{root}/bin"):
         os.mkdir(f"{root}/bin")
-        log( "No bin folder, creating...", "warning")
+        log("No bin folder, creating...", "warning")
     if not os.path.isfile(packwiz):
         log("Packwiz does not exist! Please download packwiz and put it in the bin folder!", "criticalsg")
     else:
         log(f"packwiz binary is {packwiz}", "debug")
     main_menu = [
-                [sg.T("")],
-                [sg.B("Create a new pack")],
-                [sg.T("")],
-                [sg.B("Modify pack")],
-                [sg.T("")],
-                [sg.B("Import an existing pack")],
-                [sg.T("")],
-                [sg.B("Download packwiz")],
-                [sg.T("")],
-                [sg.B("Settings")],
-                [sg.T("")],
-                [sg.B("Close packwiz-gui")],
-                [sg.T(f"packwiz-gui {VERSION_NUMBER}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
-                ]
+        [sg.T("")],
+        [sg.B("Create a new pack")],
+        [sg.T("")],
+        [sg.B("Modify pack")],
+        [sg.T("")],
+        [sg.B("Import an existing pack")],
+        [sg.T("")],
+        [sg.B("Download packwiz")],
+        [sg.T("")],
+        [sg.B("Settings")],
+        [sg.T("")],
+        [sg.B("Close packwiz-gui")],
+        [sg.T(f"packwiz-gui {VERSION_NUMBER}", font=(sg.DEFAULT_FONT[0], 8, "italic"))]
+    ]
     main_menu_window = sg.Window("Main Menu", main_menu)
     while True:
         main_menu_event, main_menu_values = main_menu_window.read()
@@ -159,20 +158,22 @@ def main():
             break
         if main_menu_event == "Create a new pack":
             pack_create = [
-                        [sg.T("Pack name:"), sg.In(key="name")],
-                        [sg.T("Author:"), sg.In(key="author")],
-                        [sg.T("Pack Version:"), sg.In(key="version")],
-                        [sg.T("Minecraft Version:"), sg.In(key="minecraftversion")],
-                        [sg.T("Modloader:"), sg.Drop(["forge", "fabric", "liteloader"], key="modloader")],
-                        [sg.T("Modloader Version:"), sg.In(key="modloaderversion")],
-                        [sg.B("Create"), sg.B("Close")],
-                        [sg.T("")],
-                        ]
+                [sg.T("Pack name:"), sg.In(key="name")],
+                [sg.T("Author:"), sg.In(key="author")],
+                [sg.T("Pack Version:"), sg.In(key="version")],
+                [sg.T("Minecraft Version:"), sg.In(key="minecraftversion")],
+                [sg.T("Modloader:"), sg.Drop(["forge", "fabric", "liteloader"], key="modloader")],
+                [sg.T("Modloader Version:"), sg.In(key="modloaderversion")],
+                [sg.B("Create"), sg.B("Close")],
+                [sg.T("")],
+            ]
             main_menu_window.hide()
             pack_create_window = sg.Window("Create new pack", pack_create)
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
-                name = pack_create_values["name"].replace("*", "_").replace("\\", "_").replace("/", "_").replace("(", "_").replace(")", "_").replace("\"", "_")
+                name = pack_create_values["name"].replace("*", "_").replace("\\", "_").replace("/", "_").replace("(",
+                                                                                                                 "_").replace(
+                    ")", "_").replace("\"", "_")
                 pack_root = f"{root}/instances/{name}"
                 if os.path.isdir(pack_root):
                     log(f"The pack \"{name}\" already exists!", "printerror")
@@ -188,9 +189,13 @@ def main():
                         else:
                             os.mkdir(pack_root)
                             os.chdir(pack_root)
-                            pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
+                            pack_create_command = runcmd(
+                                [packwiz, "init", "--name", name, "--author", author, "--version", pack_version,
+                                 "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version",
+                                 modloader_version])
                             with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
-                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**\n")
+                                pwignore.write(
+                                    "*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**\n")
                             with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
                                 gitattrib.write("* -text\n")
                             with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
@@ -212,10 +217,10 @@ def main():
             main_menu_window.UnHide()
         if main_menu_event == "Import an existing pack":
             pack_import = [
-                          [sg.T("Pack name:"), sg.In()],
-                          [sg.In(), sg.FileBrowse(file_types=(('Curseforge packs', '*.zip'),))],
-                          [sg.B("Import"), sg.B("Cancel")],
-                          ]
+                [sg.T("Pack name:"), sg.In()],
+                [sg.In(), sg.FileBrowse(file_types=(('Curseforge packs', '*.zip'),))],
+                [sg.B("Import"), sg.B("Cancel")],
+            ]
             main_menu_window.hide()
             pack_import_window = sg.Window("Import pack", pack_import)
             pack_import_event, pack_import_values = pack_import_window.read()
@@ -247,13 +252,13 @@ def main():
             for instance in os.listdir(f"{root}/instances"):
                 instances_list = instances_list + instance + "\n"
             pack_list = [
-                        [sg.T("Packs:")],
-                        [sg.T(instances_list)],
-                        [sg.T("Pack Name:"), sg.In(key="packname")],
-                        [sg.B("Open")],
-                        [sg.B("Close")],
-                        [sg.B("Delete", button_color="red")],
-                        ]
+                [sg.T("Packs:")],
+                [sg.T(instances_list)],
+                [sg.T("Pack Name:"), sg.In(key="packname")],
+                [sg.B("Open")],
+                [sg.B("Close")],
+                [sg.B("Delete", button_color="red")],
+            ]
             main_menu_window.hide()
             pack_list_window = sg.Window("Listing existing packs", pack_list)
             pack_list_event, pack_list_values = pack_list_window.read()
@@ -267,28 +272,29 @@ def main():
                     os.chdir(pack_root)
                     pack_toml = opentoml(f"{pack_root}/pack.toml")
                     pack_edit = [
-                                [sg.T("Source:"), sg.Drop(["modrinth", "curseforge"], key="source")],
-                                [sg.T("Mod: "), sg.In(key="mod")],
-                                [sg.T("")],
-                                [sg.B("Add Mod")],
-                                [sg.B("Remove Mod")],
-                                [sg.B("View Installed Mods")],
-                                [sg.B("Export to Modrinth pack")],
-                                [sg.B("Export to Curseforge pack")],
-                                [sg.B("Refresh pack")],
-                                [sg.B("Update all mods")],
-                                [sg.B("Update mod")],
-                                [sg.T("")],
-                                [sg.T("Pack name:"), sg.In(pack_toml["name"], key="name")],
-                                [sg.T("Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
-                                [sg.T("Author:"), sg.In(pack_toml["author"], key="author")],
-                                [sg.T("Pack Version:"), sg.In(pack_toml["version"], key="version")],
-                                [sg.T("Minecraft Version:"), sg.In(pack_toml["versions"]["minecraft"], key="minecraftversion")],
-                                [sg.T("Changing modloader is currently unsupported.")],
-                                [sg.B("Change")],
-                                [sg.B("Close")],
-                                [sg.T("")],
-                                ]
+                        [sg.T("Source:"), sg.Drop(["modrinth", "curseforge"], key="source")],
+                        [sg.T("Mod: "), sg.In(key="mod")],
+                        [sg.T("")],
+                        [sg.B("Add Mod")],
+                        [sg.B("Remove Mod")],
+                        [sg.B("View Installed Mods")],
+                        [sg.B("Export to Modrinth pack")],
+                        [sg.B("Export to Curseforge pack")],
+                        [sg.B("Refresh pack")],
+                        [sg.B("Update all mods")],
+                        [sg.B("Update mod")],
+                        [sg.T("")],
+                        [sg.T("Pack name:"), sg.In(pack_toml["name"], key="name")],
+                        [sg.T(
+                            "Warning: if you change the pack name, you may need to change the instance folder name yourself.")],
+                        [sg.T("Author:"), sg.In(pack_toml["author"], key="author")],
+                        [sg.T("Pack Version:"), sg.In(pack_toml["version"], key="version")],
+                        [sg.T("Minecraft Version:"), sg.In(pack_toml["versions"]["minecraft"], key="minecraftversion")],
+                        [sg.T("Changing modloader is currently unsupported.")],
+                        [sg.B("Change")],
+                        [sg.B("Close")],
+                        [sg.T("")],
+                    ]
                     pack_edit_window = sg.Window("Edit Pack", pack_edit)
                     while True:
                         pack_edit_event, pack_edit_values = pack_edit_window.read()
@@ -299,7 +305,7 @@ def main():
                             break
                         if pack_edit_event == "Add Mod":
                             os.chdir(pack_root)
-                            mod_add_command = runcmd([packwiz, source, "install", mod], input="Y\n")
+                            mod_add_command = runcmd([packwiz, source, "install", mod])
                             if mod_add_command.returncode != 0:
                                 log(f"There was an error adding mod \"{mod}\" from source \"{source}\"!", "printerror")
                                 log(f"error code {mod_add_command}", "debug")
@@ -398,7 +404,8 @@ def main():
                                 log("There was an error changing the pack details!", "printerror")
                                 log(f"error code {packwiz_refresh_command}", "debug")
                             else:
-                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.", "printsg")
+                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.",
+                                    "printsg")
             if pack_list_event == "Delete":
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
@@ -406,7 +413,8 @@ def main():
                     log(f"The pack \"{name}\" does not exist!", "printerror")
                 else:
                     pack_delete_event = sg.popup_yes_no("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA."
-                                                        "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?", title="Are you sure?")
+                                                        "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?",
+                                                        title="Are you sure?")
                     if pack_delete_event == "Yes":
                         os.chdir(root)
                         shutil.rmtree(f"{pack_root}")
@@ -414,12 +422,12 @@ def main():
             main_menu_window.UnHide()
         if main_menu_event == "Settings":
             modify_settings = [
-                              [sg.T("Backend:"), sg.Drop(["tk", "qt"], key="backend", default_value=current_backend)],
-                              [sg.Drop(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
-                              [sg.CB("Use git", key="git", default=settings["usegit"])],
-                              [sg.B("Reset settings")],
-                              [sg.B("Ok")]
-                              ]
+                [sg.T("Backend:"), sg.Drop(["tk", "qt"], key="backend", default_value=current_backend)],
+                [sg.Drop(sg.theme_list(), key="theme", default_value=settings[f"{current_backend}theme"])],
+                [sg.CB("Use git", key="git", default=settings["usegit"])],
+                [sg.B("Reset settings")],
+                [sg.B("Ok")]
+            ]
             main_menu_window.hide()
             modify_settings_window = sg.Window("Modify settings", modify_settings)
             modify_settings_event, modify_settings_values = modify_settings_window.read()
@@ -430,11 +438,13 @@ def main():
                 log("Successfully reset settings.", "printsg")
                 sys.exit()
             elif modify_settings_event == "Ok":
-                if modify_settings_values["backend"] in valid_backends and modify_settings_values["theme"] in sg.theme_list():
+                if modify_settings_values["backend"] in valid_backends and modify_settings_values[
+                    "theme"] in sg.theme_list():
                     settings["usegit"] = modify_settings_values["git"]
                     usegit = modify_settings_values["git"]
                     dumptoml(f"{root}/settings.toml", settings)
-                    if modify_settings_values["backend"] != settings["backend"] or modify_settings_values["theme"] != settings[f"{current_backend}theme"]:
+                    if modify_settings_values["backend"] != settings["backend"] or modify_settings_values["theme"] != \
+                            settings[f"{current_backend}theme"]:
                         settings["backend"] = modify_settings_values["backend"]
                         settings[f"{current_backend}theme"] = modify_settings_values["theme"]
                         dumptoml(f"{root}/settings.toml", settings)
