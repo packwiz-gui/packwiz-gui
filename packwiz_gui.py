@@ -171,9 +171,7 @@ def main():
             pack_create_window = sg.Window("Create new pack", pack_create)
             pack_create_event, pack_create_values = pack_create_window.read()
             if pack_create_event == "Create":
-                name = pack_create_values["name"].replace("*", "_").replace("\\", "_").replace("/", "_").replace("(",
-                                                                                                                 "_").replace(
-                    ")", "_").replace("\"", "_")
+                name = pack_create_values["name"].replace("*", "_").replace("\\", "_").replace("/", "_").replace("(", "_").replace(")", "_").replace("\"", "_")
                 pack_root = f"{root}/instances/{name}"
                 if os.path.isdir(pack_root):
                     log(f"The pack \"{name}\" already exists!", "printerror")
@@ -189,13 +187,9 @@ def main():
                         else:
                             os.mkdir(pack_root)
                             os.chdir(pack_root)
-                            pack_create_command = runcmd(
-                                [packwiz, "init", "--name", name, "--author", author, "--version", pack_version,
-                                 "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version",
-                                 modloader_version])
+                            pack_create_command = runcmd([packwiz, "init", "--name", name, "--author", author, "--version", pack_version, "--mc-version", mc_version, "--modloader", modloader, f"--{modloader}-version", modloader_version])
                             with open(f"{pack_root}/.packwizignore", "w", encoding="UTF-8") as pwignore:
-                                pwignore.write(
-                                    "*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**\n")
+                                pwignore.write("*.zip\n*.mrpack\n.git/**\n.gitattributes\n.gitignore\n*.jar\nserver/**\n")
                             with open(f"{pack_root}/.gitattributes", "w", encoding="UTF-8") as gitattrib:
                                 gitattrib.write("* -text\n")
                             with open(f"{pack_root}/.gitignore", "w", encoding="UTF-8") as gitignore:
@@ -404,8 +398,7 @@ def main():
                                 log("There was an error changing the pack details!", "printerror")
                                 log(f"error code {packwiz_refresh_command}", "debug")
                             else:
-                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.",
-                                    "printsg")
+                                log("Successfully changed pack details. Please change the instance folder name yourself if you have modified the name.", "printsg")
             if pack_list_event == "Delete":
                 name = pack_list_values["packname"]
                 pack_root = f"{root}/instances/{name}"
@@ -413,8 +406,7 @@ def main():
                     log(f"The pack \"{name}\" does not exist!", "printerror")
                 else:
                     pack_delete_event = sg.popup_yes_no("WARNING: THIS WILL DELETE ALL OF THIS PACK'S DATA."
-                                                        "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?",
-                                                        title="Are you sure?")
+                                                        "\nONLY PRESS YES IF YOU UNDERSTAND THIS. ARE YOU SURE?", title="Are you sure?")
                     if pack_delete_event == "Yes":
                         os.chdir(root)
                         shutil.rmtree(f"{pack_root}")
@@ -438,13 +430,11 @@ def main():
                 log("Successfully reset settings.", "printsg")
                 sys.exit()
             elif modify_settings_event == "Ok":
-                if modify_settings_values["backend"] in valid_backends and modify_settings_values[
-                    "theme"] in sg.theme_list():
+                if modify_settings_values["backend"] in valid_backends and modify_settings_values["theme"] in sg.theme_list():
                     settings["usegit"] = modify_settings_values["git"]
                     usegit = modify_settings_values["git"]
                     dumptoml(f"{root}/settings.toml", settings)
-                    if modify_settings_values["backend"] != settings["backend"] or modify_settings_values["theme"] != \
-                            settings[f"{current_backend}theme"]:
+                    if modify_settings_values["backend"] != settings["backend"] or modify_settings_values["theme"] != settings[f"{current_backend}theme"]:
                         settings["backend"] = modify_settings_values["backend"]
                         settings[f"{current_backend}theme"] = modify_settings_values["theme"]
                         dumptoml(f"{root}/settings.toml", settings)
