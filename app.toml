@@ -1,0 +1,15 @@
+[app]
+title = "packwiz-gui"
+description = "GUI wrapper for packwiz"
+git_repo = "https://github.com/packwiz-gui/packwiz-gui.git"
+git_branch = "rewrite"
+authors = ["Exo", "Terroid"]
+discord_url = "https://discord.gg/vAxTqghezr"
+version = "0.0.1"
+license = "MIT"
+website = "https://packwiz-gui.github.io/"
+
+[dependencies]
+dearpygui = { pip = "dearpygui" }
+tomli = { pip = "tomli" }
+tomli_w = { pip = "tomli_w" }
