@@ -1,4 +1,0 @@
-PySimpleGUI==4.56.0
-PySimpleGUIQt==0.35.0
-tomli==2.0.0
-tomli_w==1.0.0
