@@ -41,13 +41,15 @@ def createconfig(filename):
         "debug_mode": "false"
     }
     dumptoml(filename, settings)
+def modify_pack_open(pack_name):
+    logger.err("Placeholder for modify_pack_open(pack_name)")
 
-if not os.path.isdir("bin"):
-    logger.err("Bin folder not found! Please create bin folder and place the packwiz executable in it.")
+if not os.path.isdir(f"{root}/bin"):
+    logger.err("Bin folder not found! Please create bin folder and place the packwiz executable inside of it.")
     sys.exit()
 else:
     if not os.path.isfile(packwiz):
-        logger.err("Packwiz executable not found! Please place the packwiz executable in bin folder.")
+        logger.err("Packwiz executable not found! Please place the packwiz executable inside of the bin folder.")
         sys.exit()
 if not os.path.isdir(instances):
     logger.wrn("Instances folder not found! Creating instances folder.")
@@ -104,10 +106,17 @@ def create_pack_callback(sender, app_data):
         else:
             os.mkdir(f"{instances}/{dpg.get_value('pack_name')}")
             os.chdir(f"{instances}/{dpg.get_value('pack_name')}")
-            os.system("..\\..\\bin\packwiz.exe init --name " + dpg.get_value("pack_name") + " --version " + dpg.get_value("pack_version") + " --author " + dpg.get_value("pack_author") + " --mc-version " + dpg.get_value("pack_mc_version") + " --modloader " + dpg.get_value("pack_modloader") + " --" + dpg.get_value("pack_modloader") + "-version " + dpg.get_value("pack_modloader_version"))
-        #logger.dbg(dpg.get_item_user_data(29), debug_mode)
-        logger.dbg(str(app_data), debug_mode)
-       
+            os.system(f"{packwiz} init --name " + dpg.get_value("pack_name") + " --version " + dpg.get_value("pack_version") + " --author " + dpg.get_value("pack_author") + " --mc-version " + dpg.get_value("pack_mc_version") + " --modloader " + dpg.get_value("pack_modloader") + " --" + dpg.get_value("pack_modloader") + "-version " + dpg.get_value("pack_modloader_version"))
+            modify_pack_open(dpg.get_value('pack_name'))
+    else:
+        logger.inf("Creating pack...")
+        if os.path.isdir(f"{instances}/{dpg.get_value('pack_name')}"):
+            logger.err(f"Pack with name {dpg.get_value('pack_name')} already exists!")
+        else:
+            os.mkdir(f"{instances}/{dpg.get_value('pack_name')}")
+            os.chdir(f"{instances}/{dpg.get_value('pack_name')}")
+            os.system(f"{packwiz} init --name " + dpg.get_value("pack_name") + " --version " + dpg.get_value("pack_version") + " --author " + dpg.get_value("pack_author") + " --mc-version " + dpg.get_value("pack_mc_version") + " --modloader " + dpg.get_value("pack_modloader") + " --" + dpg.get_value("pack_modloader") + "-version " + dpg.get_value("pack_modloader_version"))
+           
     
 
 def create_new_pack_callback():
