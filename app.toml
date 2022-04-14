@@ -13,3 +13,4 @@ website = "https://packwiz-gui.github.io/"
 dearpygui = { pip = "dearpygui" }
 tomli = { pip = "tomli" }
 tomli_w = { pip = "tomli_w" }
+colorama = { pip = "colorama" }

@@ -1,2 +1,5 @@
 config.toml
 __pycache__/
+bin/
+instances/
+logs/

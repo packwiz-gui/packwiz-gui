@@ -1,12 +1,16 @@
+from email.policy import default
 import os
+import platform
+import sys
 import dearpygui.dearpygui as dpg
+import dearpygui as dpgcore
 import toml
 import logger
 import tomli_w
 import tomli
+import subprocess as sp
 from package_toml import data
-
-global debug_menu_active
+global pack_name
 def dumptoml(filename, var):
     """
     Takes in dict and filename. Dumps dict to file as toml.
@@ -29,19 +33,18 @@ def createconfig(filename):
     }
     dumptoml(filename, settings)
 
+if not os.path.isdir("bin"):
+    logger.err("Bin folder not found! Please create bin folder and place the packwiz executable in it.")
+    sys.exit()
+else:
+    if not os.path.isfile("bin/packwiz.exe"):
+        logger.err("Packwiz executable not found! Please place the packwiz executable in bin folder.")
+        sys.exit()
 def save_callback():
     print("Saving...")
 
-def debug_menu():
-    """
-    Debug menu.
-    """
-    if not debug_menu_active:
-        dpg.add_child_window(label="Debug", width=300, height=300, parent="main_menu")
-        debug_menu_active = True
-    else:
-        dpg.remove_child_window(label="Debug")
-        debug_menu_active = False
+    
+    
 
 def dumptoml(filename, var):
     """
@@ -70,11 +73,56 @@ else:
     logger.err("Invalid debug mode in config.toml. Force crashing.")
     raise ValueError("Invalid debug_mode value.")
 
+def create_pack_callback(sender, app_data):
+    if platform.system() == "Windows":
+        logger.inf("Creating pack...")
+        #sp.call(["./bin/packwiz.exe", 
+        #"init", 
+        #"--name", dpg.get_value("pack_name"), 
+        #"--version", dpg.get_value("pack_version"), 
+        #"--author", dpg.get_value("pack_author"),
+        #"--mcversion", dpg.get_value("pack_mc_version"),
+        #"--modloader", dpg.get_value("pack_modloader"),
+        #f"--{dpg.get_value('pack_modloader')}-version", dpg.get_value("pack_modloader_version")
+        #], shell=True)
+        # Convert above to os.system()
+        os.system("bin\packwiz.exe init --name " + dpg.get_value("pack_name") + " --version " + dpg.get_value("pack_version") + " --author " + dpg.get_value("pack_author") + " --mc-version " + dpg.get_value("pack_mc_version") + " --modloader " + dpg.get_value("pack_modloader") + " --" + dpg.get_value("pack_modloader") + "-version " + dpg.get_value("pack_modloader_version"))
+        #logger.dbg(dpg.get_item_user_data(29), debug_mode)
+        for item in dpg.get_all_items():
+            print(f"{item}:  {dpg.get_item_alias(item)}")
+        logger.dbg(str(app_data), debug_mode)
+       
+    
+
+def create_new_pack_callback():
+    print("Creating new package...")
+    with dpg.window(label="Create A New Pack", width=400, height=300):
+        
+        dpg.add_input_text(tag="pack_name", label="Pack Name", tracked=True, default_value="testing123")
+        dpg.add_input_text(tag="pack_version", label="Pack Version")
+        dpg.add_input_text(tag="pack_author", label="Pack Author")
+        dpg.add_input_text(tag="pack_mc_version", label="Minecraft Version")
+        dpg.add_listbox(tag="pack_modloader", label="Modloader", items=["forge", "fabric"])
+        dpg.add_input_text(tag="pack_modloader_version", label="Modloader Version")
+
+        dpg.add_button(tag="create_pack", label="Create Pack", callback=create_pack_callback)
+        dpg.add_button(tag="cancel", label="Cancel", callback=dpg.close_window)
+
+
+def load_pack_callback():
+    print("Loading package...")
+    dpg.show_window("load_pack")
+
+def settings_callback():
+    print("Settings...")
+    dpg.show_window("settings")
+
+
 
 
 dpg.create_context()
 
-dpg.create_viewport()
+dpg.create_viewport(title="Packwiz GUI")
 
 dpg.setup_dearpygui()
 
@@ -86,14 +134,13 @@ with dpg.window(label="Main Menu", width=300, height=300, tag="main_menu"):
 
     dpg.add_button(label="Save", callback=save_callback)
 
-    dpg.add_input_text(label="string")
-    debug_menu_active = False
-    if debug_mode == True:
-        dpg.add_text("Debug mode is on.")
-        debug_menu_active = False
-        dpg.add_button(label="Debug menu", callback=debug_menu)
+    dpg.add_button(label="Create a new pack", callback=create_new_pack_callback)
 
-    dpg.add_slider_float(label="float")
+    dpg.add_button(label="Load a pack", callback=load_pack_callback)
+
+    dpg.add_button(label="Settings", callback=settings_callback)
+
+    dpg.add_button(label="Exit", callback=sys.exit)
 
 
 
